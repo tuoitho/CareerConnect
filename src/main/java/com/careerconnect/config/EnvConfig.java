@@ -14,9 +14,4 @@ public class EnvConfig {
         return dotenv.get(key);
     }
 
-    static String dbUrl=dotenv.get("DB_URL");
-    public static void main(String[] args) {
-        System.out.println("Database URL: " + dbUrl);
-    }
-
 }
