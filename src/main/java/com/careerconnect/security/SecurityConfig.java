@@ -21,7 +21,21 @@ import org.springframework.security.web.context.request.async.WebAsyncManagerInt
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+    public static final String[] AUTH_WHITELIST = {
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/api/auth/**",
+            "/api/refresh/**",
+            "/api/test2"
+    };
+    public static final String[] REQUIRED_AUTH = {
+            "/api/test"
+    };
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -35,7 +49,7 @@ public class SecurityConfig {
 //                .exceptionHandling(exceptionHandling -> exceptionHandling
 //                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))  // Sử dụng JwtAuthenticationEntryPoint để xử lý các yêu cầu không hợp lệ
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

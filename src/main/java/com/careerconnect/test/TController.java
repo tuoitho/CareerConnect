@@ -8,12 +8,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("")
 public class TController {
-    @GetMapping("")
+    @GetMapping("/api/test")
     public String test(Principal principal) {
         Logger.log("Principal: " + principal);
         Logger.log("Name: " + principal.getName());
         return "Test";
+    }
+    @GetMapping("/api/test2")
+    public String test2(Principal principal) {
+        Logger.log("Principal: " + principal);
+        Logger.log("Name: " + principal.getName());
+        return "Test2";
     }
 }

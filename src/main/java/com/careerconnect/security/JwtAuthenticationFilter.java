@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -32,8 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getServletPath();
-        if (path.startsWith("/api/auth/")) {
+        final Set<String> AUTH_WHITELIST = Set.of(SecurityConfig.AUTH_WHITELIST);
+        if (AUTH_WHITELIST.stream().anyMatch(path -> request.getServletPath().startsWith(path))) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -66,8 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
-        } else {
-            throw new CustomJwtException("Unauthorized");
         }
+        throw new CustomJwtException("Authorization header is required");
     }
 }
