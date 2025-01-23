@@ -1,25 +1,24 @@
 package com.careerconnect.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Builder
-public class User {
+@Getter
+@Setter
+@Table(name = "[User]")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
-    private String username;
-    private String password;
-    private String role;
-    private Boolean active;
+    protected Long userId;
+    protected String username;
+    protected String password;
+    protected Boolean active=true;
+
+    @ManyToOne
+    @JoinColumn
+    protected Role role;
 }

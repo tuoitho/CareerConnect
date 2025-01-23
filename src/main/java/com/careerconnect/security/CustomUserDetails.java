@@ -26,7 +26,7 @@ public class CustomUserDetails implements UserDetails {
         userId = user.getUserId();
         userName = user.getUsername();
         password = user.getPassword();
-        role = user.getRole();
+        role = user.getRole().getRoleName().name();
         authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_"+role));
         active = user.getActive();
     }

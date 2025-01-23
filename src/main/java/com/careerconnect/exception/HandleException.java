@@ -1,6 +1,6 @@
 package com.careerconnect.exception;
 
-import com.careerconnect.body.ApiResponse;
+import com.careerconnect.dto.ApiResponse;
 import com.careerconnect.util.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,10 +12,26 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class HandleException {
 
-    //    AuthenticationException
+    @ExceptionHandler(value = Exception.class)
+    ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception e) {
+        ApiResponse<?> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage(e.getMessage());
+        apiResponse.setCode(400);
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(value = AppException.class)
+    ResponseEntity<ApiResponse<?>> handlingAppException(AppException exception) {
+        ErrorCode errorCode = exception.getErrorCode();
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build();
+        return ResponseEntity.status(apiResponse.getCode()).body(apiResponse);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
-        //type of exception
+    ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
         Logger.log("AuthenticationException: " + e.getMessage(), e.getClass().getName());
         String errorMessage;
         int code;
@@ -37,12 +53,4 @@ public class HandleException {
         return ResponseEntity.status(code).body(response);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception e) {
-        ApiResponse<?> response = ApiResponse.builder()
-                .code(500)
-                .message(e.getMessage())
-                .build();
-        return ResponseEntity.status(500).body(response);
-    }
 }

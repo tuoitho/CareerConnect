@@ -1,6 +1,6 @@
 package com.careerconnect.controller;
 
-import com.careerconnect.body.response.TokenResponse;
+import com.careerconnect.dto.response.TokenResponse;
 import com.careerconnect.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

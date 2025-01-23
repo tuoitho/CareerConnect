@@ -1,4 +1,4 @@
-package com.careerconnect.body.request;
+package com.careerconnect.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginRequest {
+public class RegisterRequest {
     private String username;
     private String password;
+    private String email;
+    private String fullname;
+    private String userType;
 }

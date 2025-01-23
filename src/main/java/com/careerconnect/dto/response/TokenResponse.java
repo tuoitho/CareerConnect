@@ -1,4 +1,4 @@
-package com.careerconnect.body.response;
+package com.careerconnect.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginResponse {
-    private String username;
-    private String accessToken;
-    private String refreshToken;
+public class TokenResponse {
+    String accessToken;
 }
