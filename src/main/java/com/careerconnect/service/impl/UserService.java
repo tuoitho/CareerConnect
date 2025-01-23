@@ -13,6 +13,7 @@ import com.careerconnect.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public String generateAccessToken(Authentication authentication) {
         return tokenProvider.generateAccessToken(authentication);
@@ -41,6 +43,8 @@ public class UserService {
                     .orElseGet(() -> roleRepository.save(Role.builder().roleName(RoleEnum.RECRUITER).build()));
             user.setRole(role);
         }
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        //password is hashed in the mapper
         userRepository.save(user);
     }
 }
