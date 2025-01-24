@@ -1,6 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.dto.ApiResponse;
+import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.dto.request.RegisterCompanyRequest;
 import com.careerconnect.service.ImageService;
 import com.careerconnect.service.impl.CompanyService;
@@ -47,6 +48,17 @@ public class CompanyController {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Company updated successfully")
                 .result(companyService.updateCompany(authenticationHelper.getUserId(), registerCompanyRequest))
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    //add member
+
+    @PostMapping("/company/addmember")
+    public ResponseEntity<?> addMember(@RequestBody AddMemberRequest addMemberRequest) {
+        companyService.addMember(authenticationHelper.getUserId(),addMemberRequest);
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Mời thành viên thành công")
                 .build();
         return ResponseEntity.ok(response);
     }
