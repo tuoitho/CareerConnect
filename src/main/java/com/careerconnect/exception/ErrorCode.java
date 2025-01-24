@@ -12,7 +12,23 @@ public enum ErrorCode {
     UNAUTHORIZED(403, "You do not have permission", HttpStatus.FORBIDDEN),
     EXPIRED_TOKEN(401, "EXPIRED_TOKEN", HttpStatus.UNAUTHORIZED),
     INVALID_USERTYPE(400, "Invalid user type", HttpStatus.BAD_REQUEST),
-    ROLE_NOT_FOUND(404, "Role not found", HttpStatus.NOT_FOUND),;
+    ROLE_NOT_FOUND(404, "Role not found", HttpStatus.NOT_FOUND), COMPANY_NOT_FOUND(404, "Company not found", HttpStatus.NOT_FOUND),
+
+
+    USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND)
+
+
+
+
+
+
+
+
+
+    ;
+    ;
+    ;
+    ;
 
     private final int code;
     private final String message;

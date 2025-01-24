@@ -18,7 +18,8 @@ public class Recruiter extends User{
     private String contact;
     private String email;
     private boolean isRepresentative; // Có phải người đại diện không
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Company company;
 
