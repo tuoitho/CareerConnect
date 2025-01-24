@@ -22,7 +22,8 @@ public class Company {
     private String website;
     private String description; // Mô tả
     private String logo;
-    private Boolean active;
+    @Builder.Default
+    private Boolean active=true;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

@@ -1,5 +1,6 @@
 package com.careerconnect.service.impl;
 
+import com.careerconnect.dto.request.RegisterCompanyRequest;
 import com.careerconnect.dto.response.CompanyResponse;
 import com.careerconnect.entity.Company;
 import com.careerconnect.entity.Recruiter;
@@ -11,6 +12,8 @@ import com.careerconnect.repository.UserRepository;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,17 @@ public class CompanyService {
             throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
         }
         return companyMapper.toCompanyResponse(company);
+    }
+
+    public CompanyResponse registerCompany(Long userId, RegisterCompanyRequest registerCompanyRequest) {
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (recruiter.getCompany() != null) {
+            throw new AppException(ErrorCode.COMPANY_ALREADY_REGISTERED);
+        }
+        Company company = companyMapper.toCompany(registerCompanyRequest);
+        company.setRecruiters(List.of(recruiter));
+        recruiter.setCompany(company);
+        return companyMapper.toCompanyResponse(companyRepo.save(company));
     }
 
 

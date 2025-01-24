@@ -15,17 +15,10 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(404, "Role not found", HttpStatus.NOT_FOUND), COMPANY_NOT_FOUND(404, "Company not found", HttpStatus.NOT_FOUND),
 
 
-    USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND)
+    USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
 
 
-
-
-
-
-
-
-
-    ;
+    COMPANY_ALREADY_REGISTERED(400, "Company already registered", HttpStatus.BAD_REQUEST)
     ;
     ;
     ;
