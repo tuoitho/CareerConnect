@@ -9,7 +9,9 @@ import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.mapper.CompanyMapper;
 import com.careerconnect.repository.CompanyRepo;
 import com.careerconnect.repository.UserRepository;
+import com.careerconnect.service.ImageService;
 import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class CompanyService {
     private final RoleService roleService;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final ImageService imageService;
     public CompanyResponse getCurrentCompany(Long userId) {
         Recruiter recruiter= (Recruiter)userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Company company = recruiter.getCompany();
@@ -40,9 +43,23 @@ public class CompanyService {
         }
         Company company = companyMapper.toCompany(registerCompanyRequest);
         company.setRecruiters(List.of(recruiter));
+        if (registerCompanyRequest.getLogo() != null)
+            company.setLogo(imageService.uploadCloudinary(registerCompanyRequest.getLogo()));
         recruiter.setCompany(company);
         return companyMapper.toCompanyResponse(companyRepo.save(company));
     }
 
 
+    public CompanyResponse updateCompany(Long userId, RegisterCompanyRequest registerCompanyRequest) {
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Company company = recruiter.getCompany();
+        if (company == null) {
+            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+        }
+        companyMapper.updateCompany(company, registerCompanyRequest);
+        if (registerCompanyRequest.getLogo() != null)
+            company.setLogo(imageService.uploadCloudinary(registerCompanyRequest.getLogo()));
+        Logger.log(registerCompanyRequest);
+        return companyMapper.toCompanyResponse(companyRepo.save(company));
+    }
 }
