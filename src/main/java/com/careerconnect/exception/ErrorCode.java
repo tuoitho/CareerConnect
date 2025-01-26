@@ -18,10 +18,26 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
 
 
-    COMPANY_ALREADY_REGISTERED(400, "Company already registered", HttpStatus.BAD_REQUEST)
+    COMPANY_ALREADY_REGISTERED(400, "Company already registered", HttpStatus.BAD_REQUEST),
+    INVITATION_NOT_FOUND(404, "Invitation not found", HttpStatus.NOT_FOUND),
+    INVITATION_EXPIRED(400, "Invitation expired", HttpStatus.BAD_REQUEST),
+    INVALID_INVITATION(400, "Invalid invitation", HttpStatus.BAD_REQUEST);
+
+
+
+
+
+
+
+
+
+
+
     ;
     ;
     ;
+    ;
+
 
     private final int code;
     private final String message;

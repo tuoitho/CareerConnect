@@ -1,5 +1,6 @@
 package com.careerconnect.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,10 +25,12 @@ public class Invitation {
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private Recruiter inviter; // Người gửi lời mời
 
     @ManyToOne
     @JoinColumn()
+    @JsonIgnore
     private Recruiter invitee; // Người được mời (nếu đã đăng ký)
 
     @ManyToOne

@@ -62,4 +62,23 @@ public class CompanyController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/company/accept")
+    public ResponseEntity<?> joinCompany(@RequestParam String token) {
+        Long userId = authenticationHelper.getUserId();
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Tham gia công ty thành công")
+                .result(companyService.accept(userId,token))
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/invitation/{token}")
+    public ResponseEntity<?> getInvitation(@PathVariable String token) {
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Lấy thông tin thành công")
+                .result(companyService.getInvitation(token))
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }
