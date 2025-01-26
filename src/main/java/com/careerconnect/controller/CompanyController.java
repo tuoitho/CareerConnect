@@ -79,10 +79,18 @@ public class CompanyController {
                 .build();
         return ResponseEntity.ok(response);
     }
-
+    @GetMapping("/invitation")
+    public ResponseEntity<?> getInvitations(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "2") int size) {
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Lấy thông tin thành công")
+                .result(companyService.getInvitations(authenticationHelper.getUserId(),page,size))
+                .build();
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("/company/member")
     public ResponseEntity<?> getMembers( @RequestParam(defaultValue = "0") int page,
-                                         @RequestParam(defaultValue = "10") int size) {
+                                         @RequestParam(defaultValue = "2") int size) {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Lấy thông tin thành công")
                 .result(companyService.getMembers(authenticationHelper.getUserId(),page,size))

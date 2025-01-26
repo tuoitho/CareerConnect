@@ -4,6 +4,7 @@ import com.careerconnect.dto.common.MailDTO;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.dto.request.RegisterCompanyRequest;
+import com.careerconnect.dto.response.AllInvitationResponse;
 import com.careerconnect.dto.response.CompanyResponse;
 import com.careerconnect.dto.response.InvitationResponse;
 import com.careerconnect.dto.response.MemberResponse;
@@ -144,6 +145,23 @@ public class CompanyService {
                 .email(r.getEmail())
                 .fullname(r.getFullname())
                 .contact(r.getContact())
+                .build());
+    }
+
+    public PaginatedResponse<AllInvitationResponse> getInvitations(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Company company = recruiter.getCompany();
+        if (company == null) {
+            throw new AppException(ErrorCode.NOT_IN_COMPANY);
+        }
+        Page<Invitation> invitations = invitationRepository.findAllByCompany(company, pageable);
+        return paginationService.paginate(invitations, i -> AllInvitationResponse.builder()
+                .id(i.getId())
+                .email(i.getEmail())
+                .expiryDate(i.getExpiryDate())
+                .accepted(i.isAccepted())
+                .inviterName(i.getInviter().getFullname())
                 .build());
     }
 }
