@@ -136,6 +136,9 @@ public class CompanyService {
         Pageable pageable = PageRequest.of(page, size);
         Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Company company = recruiter.getCompany();
+        if (company == null) {
+            throw new AppException(ErrorCode.NOT_IN_COMPANY);
+        }
         Page<Recruiter> recruiters = recruiterRepo.findAllByCompany(company, pageable);
         return paginationService.paginate(recruiters, r -> MemberResponse.builder()
                 .email(r.getEmail())
