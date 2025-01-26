@@ -1,6 +1,6 @@
 package com.careerconnect.exception;
 
-import com.careerconnect.dto.ApiResponse;
+import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.util.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

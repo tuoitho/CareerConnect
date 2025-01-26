@@ -1,6 +1,6 @@
 package com.careerconnect.security;
 
-import com.careerconnect.dto.ApiResponse;
+import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.exception.CustomJwtException;
 import com.careerconnect.util.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;

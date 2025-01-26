@@ -1,10 +1,12 @@
 package com.careerconnect.service.impl;
 
 import com.careerconnect.dto.common.MailDTO;
+import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.dto.request.RegisterCompanyRequest;
 import com.careerconnect.dto.response.CompanyResponse;
 import com.careerconnect.dto.response.InvitationResponse;
+import com.careerconnect.dto.response.MemberResponse;
 import com.careerconnect.entity.Company;
 import com.careerconnect.entity.Invitation;
 import com.careerconnect.entity.Recruiter;
@@ -14,12 +16,17 @@ import com.careerconnect.mapper.CompanyMapper;
 import com.careerconnect.mapper.InvitationMapper;
 import com.careerconnect.repository.CompanyRepo;
 import com.careerconnect.repository.InvitationRepository;
+import com.careerconnect.repository.RecruiterRepo;
 import com.careerconnect.repository.UserRepository;
 import com.careerconnect.service.ImageService;
 import com.careerconnect.service.MailService;
+import com.careerconnect.service.PaginationService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +38,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
+    private final PaginationService paginationService;
     private final CompanyRepo companyRepo;
     private final AuthenticationHelper authenticationHelper;
     private final CompanyMapper companyMapper;
@@ -42,6 +50,7 @@ public class CompanyService {
     private final InvitationRepository invitationRepository;
     private final MailService mailService;
     private final InvitationMapper invitationMapper;
+    private final RecruiterRepo recruiterRepo;
 
     public CompanyResponse getCurrentCompany(Long userId) {
         Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -120,5 +129,18 @@ public class CompanyService {
     public InvitationResponse getInvitation(String token) {
         Invitation invitation = invitationRepository.findByToken(token).orElseThrow(() -> new AppException(ErrorCode.INVITATION_NOT_FOUND));
         return invitationMapper.toInvitationResponse(invitation);
+    }
+
+
+    public PaginatedResponse<MemberResponse> getMembers(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Company company = recruiter.getCompany();
+        Page<Recruiter> recruiters = recruiterRepo.findAllByCompany(company, pageable);
+        return paginationService.paginate(recruiters, r -> MemberResponse.builder()
+                .email(r.getEmail())
+                .fullname(r.getFullname())
+                .contact(r.getContact())
+                .build());
     }
 }

@@ -1,4 +1,4 @@
-package com.careerconnect.dto;
+package com.careerconnect.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

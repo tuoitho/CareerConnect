@@ -1,6 +1,6 @@
 package com.careerconnect.controller;
 
-import com.careerconnect.dto.ApiResponse;
+import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.LoginRequest;
 import com.careerconnect.dto.request.RegisterRequest;
 import com.careerconnect.dto.response.LoginResponse;

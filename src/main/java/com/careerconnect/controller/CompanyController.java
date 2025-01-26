@@ -1,16 +1,14 @@
 package com.careerconnect.controller;
 
-import com.careerconnect.dto.ApiResponse;
+import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.dto.request.RegisterCompanyRequest;
 import com.careerconnect.service.ImageService;
 import com.careerconnect.service.impl.CompanyService;
 import com.careerconnect.util.AuthenticationHelper;
-import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/recruiter")
@@ -78,6 +76,16 @@ public class CompanyController {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Lấy thông tin thành công")
                 .result(companyService.getInvitation(token))
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/company/member")
+    public ResponseEntity<?> getMembers( @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "10") int size) {
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Lấy thông tin thành công")
+                .result(companyService.getMembers(authenticationHelper.getUserId(),page,size))
                 .build();
         return ResponseEntity.ok(response);
     }
