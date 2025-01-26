@@ -1,10 +1,12 @@
 package com.careerconnect.exception;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 @Getter
+@RequiredArgsConstructor
 public enum ErrorCode {
     USERNAME_EXISTED(400, "Username is already taken", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(400, "Email is already taken", HttpStatus.BAD_REQUEST),
@@ -39,11 +41,5 @@ public enum ErrorCode {
     private final int code;
     private final String message;
     private final HttpStatusCode statusCode;
-
-    ErrorCode(int code, String message, HttpStatusCode statusCode) {
-        this.code = code;
-        this.message = message;
-        this.statusCode = statusCode;
-    }
 
 }
