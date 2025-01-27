@@ -106,8 +106,14 @@ public class CompanyService {
                 .build();
         invitationRepository.save(invitation);
         //send mail
-        mailService.send(MailDTO.builder().text("You have been invited to join " + company.getName() + " on CareerConnect. Click the link below to accept the invitation. \n" +
-                "http://localhost:3000/recruiter/invitation/" + token).to(addMemberRequest.getEmail()).subject("Invitation to join " + company.getName()).build());
+        MailDTO mailDTO = MailDTO.builder()
+                .from("no-reply@example.com")
+                .text("You have been invited to join " + company.getName() + " on CareerConnect. Click the link below to accept the invitation. \n" +
+                        "http://localhost:3000/recruiter/invitation/" + token)
+                .to(addMemberRequest.getEmail())
+                .subject("Invitation to join " + company.getName())
+                .build();
+        mailService.send(mailDTO);
     }
 
     public InvitationResponse accept(Long userId, String token) {

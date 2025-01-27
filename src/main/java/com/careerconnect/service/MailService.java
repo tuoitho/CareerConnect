@@ -14,9 +14,9 @@ public class MailService {
 
     public void send(MailDTO mailDTO) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("no-reply@example.com");
+        message.setFrom(mailDTO.getFrom());
         message.setTo(mailDTO.getTo());
-        message.setSubject("Lời mời nhà tuyển dụng tham gia Career Connect");
+        message.setSubject(mailDTO.getSubject());
         message.setText(mailDTO.getText());
         javaMailSender.send(message);
     }
