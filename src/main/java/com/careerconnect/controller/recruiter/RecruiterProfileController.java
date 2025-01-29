@@ -1,0 +1,35 @@
+package com.careerconnect.controller.recruiter;
+
+import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.request.RecruiterProfileRequest;
+import com.careerconnect.service.impl.RecruiterProfileService;
+import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/recruiter/profile")
+@RequiredArgsConstructor
+public class RecruiterProfileController {
+    private final RecruiterProfileService recruiterProfileService;
+    private final AuthenticationHelper authenticationHelper;
+
+    @GetMapping()
+    public ResponseEntity<?> getProfile() {
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Company retrieved successfully")
+                .result(recruiterProfileService.getProfile(authenticationHelper.getUserId()))
+                .build();
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping()
+    public ResponseEntity<?> updateProfile(@RequestBody  RecruiterProfileRequest req) {
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Company updated successfully")
+                .result(recruiterProfileService.updateProfile(authenticationHelper.getUserId(), req))
+                .build();
+        return ResponseEntity.ok(response);
+    }
+}
