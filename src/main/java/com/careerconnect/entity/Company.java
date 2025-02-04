@@ -20,7 +20,9 @@ public class Company {
     private String name;
     private String address; // Địa chỉ
     private String website;
+    @Column(columnDefinition = "TEXT")
     private String description; // Mô tả
+    @Column(columnDefinition = "TEXT")
     private String logo;
     @Builder.Default
     private Boolean active=true;

@@ -4,6 +4,7 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
 import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class JobController {
     @GetMapping
     public ResponseEntity<?> getJobs(@RequestParam int page, @RequestParam int size) {
         var jobs = jobService.getJobs(authenticationHelper.getUserId(),page, size);
+
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Jobs retrieved successfully")
                 .result(jobs)

@@ -17,6 +17,7 @@ public class HandleException {
         ApiResponse<?> apiResponse = new ApiResponse<>();
         apiResponse.setMessage(e.getMessage());
         apiResponse.setCode(400);
+        e.printStackTrace();
         return ResponseEntity.badRequest().body(apiResponse);
     }
 

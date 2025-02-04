@@ -163,6 +163,7 @@ public class JobService {
         }
         Pageable pageable = PageRequest.of(page, size);
         Page<Job> jobs = jobRepository.findAllByCompany(company, pageable);
+        Logger.log("Jobs: " + jobs.getContent());
         return paginationService.paginate(jobs, j -> CreateJobResponse.builder()
                 .jobId(j.getJobId())
                 .title(j.getTitle())

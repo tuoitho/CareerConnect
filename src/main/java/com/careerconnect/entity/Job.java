@@ -21,6 +21,7 @@ public class Job {
     private String title;
     private String description;
     private String location;
+    @Enumerated(EnumType.STRING)
     private JobTypeEnum type;
 //    range of salary
     private String minSalary;
@@ -30,6 +31,7 @@ public class Job {
     private LocalDateTime updated;
     private LocalDateTime deadline;
 
+    @Enumerated(EnumType.STRING)
     private ExpEnum experience;
 
     private String category;
