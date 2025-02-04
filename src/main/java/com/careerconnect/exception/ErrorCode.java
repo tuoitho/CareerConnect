@@ -23,17 +23,8 @@ public enum ErrorCode {
     NOT_IN_COMPANY(400, "You are not in a company", HttpStatus.BAD_REQUEST),
 
 
-
-
-
-
-
-
-
-
-
-    ;
-    ;
+    JOB_NOT_FOUND(404, "Job not found", HttpStatus.NOT_FOUND),
+    NOT_PERMITTED(403, "You are not permitted to perform this action", HttpStatus.FORBIDDEN),;
     ;
     ;
 

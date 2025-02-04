@@ -35,9 +35,9 @@ public class Candidate extends User{
 //    @OneToMany(mappedBy = "candidate")
 //    private List<Experience> experiences;
 //
-//    @OneToMany(mappedBy = "candidate")
-//    private List<CV> cvs;
+    @OneToMany(mappedBy = "candidate")
+    private List<CV> cvs;
 //
-//    @OneToMany(mappedBy = "candidate")
-//    private List<Application> applications;
+    @OneToMany(mappedBy = "candidate")
+    private List<Application> applications;
 }
