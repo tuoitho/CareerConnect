@@ -4,8 +4,11 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.LoginRequest;
 import com.careerconnect.dto.request.RegisterRequest;
 import com.careerconnect.dto.response.LoginResponse;
+import com.careerconnect.entity.User;
+import com.careerconnect.security.CustomUserDetails;
 import com.careerconnect.security.JwtTokenProvider;
 import com.careerconnect.service.impl.UserService;
+import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +28,7 @@ public class AuthController {
     private final JwtTokenProvider tokenProvider;
     private final CookieUtil cookieUtil;
     private final UserService userService;
+    private final AuthenticationHelper authenticationHelper;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -36,18 +40,24 @@ public class AuthController {
         );
         String accessToken = tokenProvider.generateAccessToken(authentication);
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
-        // Tạo refresh token cookie
-        ResponseCookie cookie = cookieUtil.generateRefreshTokenCookie(refreshToken);
+
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+
+        LoginResponse.LoggedInUser loggedInUser = LoginResponse.LoggedInUser.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .role(user.getRole())
+                .build();
+
         LoginResponse loginResponse = LoginResponse.builder()
-                .username(loginRequest.getUsername())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .user(loggedInUser)
                 .build();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(loginResponse);
+        return ResponseEntity.ok().body(loginResponse);
 
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         userService.registerUser(registerRequest);

@@ -35,4 +35,12 @@ public class AuthenticationHelper {
         }
         return null; // Hoặc xử lý trường hợp không tìm thấy userId
     }
+
+    public User getCurrentUser() {
+        Long userId = getUserId();
+        if (userId != null) {
+            return userRepository.findById(userId).orElse(null);
+        }
+        return null;
+    }
 }

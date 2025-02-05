@@ -2,6 +2,8 @@ package com.careerconnect.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 
 @Setter
 @Getter
@@ -9,9 +11,10 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class ApiResponse<T>{
     @Builder.Default
     private int code = 200;
     private String message;
     private T result;
+
 }
