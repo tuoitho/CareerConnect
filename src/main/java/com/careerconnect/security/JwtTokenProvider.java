@@ -29,10 +29,10 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("type", TokenType.ACCESS)
-//                .setIssuedAt(now)
-//                .setExpiration(expiryDate)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + 10000))
+                .setExpiration(expiryDate)
+//                .setIssuedAt(now)
+//                .setExpiration(new Date(System.currentTimeMillis() + 11))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
