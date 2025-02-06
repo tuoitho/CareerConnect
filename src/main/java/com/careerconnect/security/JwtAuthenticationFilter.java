@@ -38,8 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Logger.log(AUTH_WHITELIST);
         Logger.log(request.getServletPath());
         if (AUTH_WHITELIST.stream().anyMatch(pattern  -> pathMatcher.match(pattern, path))) {
-            Logger.log("JwtAuthenticationFilter: doFilterInternal: AUTH_WHITELIST");
-
             filterChain.doFilter(request, response);
             return;
         }
@@ -55,7 +53,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            Logger.log("JwtAuthenticationFilter: doFilterInternal: catch");
             handleJwtError(response, ex);
         }
     }
