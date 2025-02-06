@@ -22,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -72,7 +73,7 @@ public class CandidateProfileService {
                 .phone(candidate.getPhone())
                 .email(candidate.getEmail())
                 .bio(candidate.getBio())
-                .skills(candidate.getSkills())
+                .skills(candidate.getSkills().stream().map(Skill::getName).collect(Collectors.toSet()))
                 .educations(educations)
                 .experiences(experiences)
                 .cvs(cvs)
@@ -83,7 +84,19 @@ public class CandidateProfileService {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        BeanUtils.copyProperties(request, candidate, "educations", "experiences", "cvs");
+        BeanUtils.copyProperties(request, candidate, "skills","educations", "experiences", "cvs");
+        Set<Skill> skills = request.getSkills().stream()
+                .map(skill ->Skill.builder()
+                        .skillId(null)
+                        .name(skill)
+                        .candidate(candidate)
+                        .build())
+                .collect(Collectors.toSet());
+        if (candidate.getSkills() == null) {
+            candidate.setSkills(new HashSet<>());
+        }
+        candidate.getSkills().clear();
+        candidate.getSkills().addAll(skills);
         Set<Education> educations = request.getEducations().stream().map(edu -> Education.builder()
                         .educationId(edu.getEducationId())
                         .school(edu.getSchool())
@@ -124,7 +137,7 @@ public class CandidateProfileService {
                 .phone(savedCandidate.getPhone())
                 .email(savedCandidate.getEmail())
                 .bio(savedCandidate.getBio())
-                .skills(savedCandidate.getSkills())
+                .skills(savedCandidate.getSkills().stream().map(Skill::getName).collect(Collectors.toSet()))
                 .educations(savedCandidate.getEducations().stream()
                         .map(edu -> CandidateProfileResponse.EducationResponse.builder()
                                 .school(edu.getSchool())

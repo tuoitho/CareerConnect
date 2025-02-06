@@ -21,9 +21,9 @@ public class Candidate extends User {
     private String email;
     private String bio;
 
-    @ElementCollection
-    @CollectionTable
-    private Set<String> skills = new HashSet<>();
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Skill> skills;
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Education> educations;
@@ -36,6 +36,7 @@ public class Candidate extends User {
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Application> applications;
+
 
     public void assignEducations(Set<Education> newEducations) {
         if (this.educations == null) {
