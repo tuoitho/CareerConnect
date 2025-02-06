@@ -4,8 +4,6 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
-import com.careerconnect.util.Logger;
-import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +27,11 @@ public class JobController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getJobById(@PathVariable Long id) {
-        var job = jobService.getJobById(id);
+    @GetMapping("/{jobId}")
+    public ResponseEntity<?> getJobById(@PathVariable Long jobId) {
+        var job = jobService.getPostedJobDetail(jobId);
         ApiResponse<?> response = ApiResponse.builder()
-                .message("Job retrieved successfully")
+                .message("Job Details retrieved successfully")
                 .result(job)
                 .build();
         return ResponseEntity.ok(response);

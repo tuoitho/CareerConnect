@@ -4,9 +4,8 @@ import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.dto.response.CreateJobResponse;
 import com.careerconnect.dto.response.MemberResponse;
-import com.careerconnect.entity.Company;
-import com.careerconnect.entity.Job;
-import com.careerconnect.entity.Recruiter;
+import com.careerconnect.dto.response.PostedJobDetailResponse;
+import com.careerconnect.entity.*;
 import com.careerconnect.enums.JobTypeEnum;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
@@ -26,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +94,24 @@ public class JobService {
                 .category(job.getCategory())
                 .active(job.isActive())
                 .build();
+    }
+
+    public PostedJobDetailResponse getPostedJobDetail(Long jobId) {
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        List<Application> applications = applicationRepo.findAllByJob(job);
+        List<PostedJobDetailResponse.ApplicationWithCandidate> applicationWithCandidates = applications.stream().map(application -> {
+            Candidate candidate = application.getCandidate();
+            return PostedJobDetailResponse.ApplicationWithCandidate.builder()
+                            .applicationId(application.getApplicationId())
+                            .candidateName(candidate.getFullname())
+                            .appliedAt(application.getAppliedAt())
+                            .processed(application.isProcessed())
+                            .build();
+        }).toList();
+        PostedJobDetailResponse response = new PostedJobDetailResponse();
+        BeanUtils.copyProperties(job, response);
+        response.setApplications(applicationWithCandidates);
+        return response;
     }
 
     public CreateJobResponse updateJob(Long userId, Long id, CreateJobRequest job) {
