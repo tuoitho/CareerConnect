@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +18,12 @@ public class Application {
     private Long applicationId;
 
     private String coverLetter;
+
+    @Builder.Default
+    private LocalDateTime appliedAt=LocalDateTime.now();
+
+    @Builder.Default
+    private boolean processed=false;
 
     @OneToOne(mappedBy = "application")
     private ApplicationCV applicationCV;
