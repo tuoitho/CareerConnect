@@ -134,4 +134,12 @@ public class Candidate extends User {
         });
     }
 
+    public void addCV(CV cv) {
+        if (this.cvs == null) {
+            this.cvs = new HashSet<>();
+        }
+        cv.setCandidate(this);
+        this.cvs.add(cv);
+    }
+
 }

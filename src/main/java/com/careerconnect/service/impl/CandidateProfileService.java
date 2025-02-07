@@ -1,29 +1,21 @@
 package com.careerconnect.service.impl;
 
 import com.careerconnect.dto.request.CandidateProfileRequest;
-import com.careerconnect.dto.request.RecruiterProfileRequest;
 import com.careerconnect.dto.response.CandidateProfileResponse;
-import com.careerconnect.dto.response.RecruiterProfileResponse;
 import com.careerconnect.entity.*;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
-import com.careerconnect.mapper.CompanyMapper;
-import com.careerconnect.mapper.InvitationMapper;
 import com.careerconnect.repository.*;
+import com.careerconnect.service.FileStoreService;
 import com.careerconnect.service.ImageService;
-import com.careerconnect.service.MailService;
-import com.careerconnect.service.PaginationService;
-import com.careerconnect.util.AuthenticationHelper;
-import com.careerconnect.util.Logger;
+import com.cloudinary.Cloudinary;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +24,10 @@ import java.util.stream.Collectors;
 public class CandidateProfileService {
 
     private final CandidateRepo candidateRepository;
+    private final Cloudinary cloudinary;
+    private final ImageService imageService;
+    private final FileStoreService fileStoreService;
+
     @Transactional
     public CandidateProfileResponse getProfile(Long candidateId) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
@@ -64,6 +60,7 @@ public class CandidateProfileService {
                         .cvId(cv.getCvId())
                         .name(cv.getName())
                         .path(cv.getPath())
+                        .active(cv.getActive())
                         .build())
                 .collect(Collectors.toSet());
         return CandidateProfileResponse.builder()
@@ -80,7 +77,7 @@ public class CandidateProfileService {
                 .build();
     }
     @Transactional
-    public CandidateProfileResponse updateProfile(Long candidateId, CandidateProfileRequest request) {
+    public CandidateProfileResponse updateProfile(Long candidateId, CandidateProfileRequest request, MultipartFile avatar) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -129,6 +126,13 @@ public class CandidateProfileService {
                         .build())
                 .collect(Collectors.toSet());
         candidate.assignCVs(cvs);
+
+        // Handle avatar upload if provided
+        if (avatar != null && !avatar.isEmpty()) {
+            String avatarPath = imageService.uploadCloudinary(avatar);
+            candidate.setAvatar(avatarPath);
+            candidate.setAvatar(avatarPath);
+        }
         Candidate savedCandidate = candidateRepository.save(candidate);
         return CandidateProfileResponse.builder()
                 .userId(savedCandidate.getUserId())
@@ -169,6 +173,29 @@ public class CandidateProfileService {
                                 .active(cv.getActive())
                                 .build())
                         .collect(Collectors.toSet()))
+                .build();
+    }
+
+    public CandidateProfileResponse.CVResponse uploadCV(Long candidateId, String cvName, MultipartFile file) {
+        Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String cvPath = fileStoreService.uploadPdf(file);
+        CV cv = CV.builder()
+                .name(cvName)
+                .path(cvPath)
+                .candidate(candidate)
+                .build();
+        candidate.addCV(cv);
+        Candidate savedCandidate=candidateRepository.save(candidate);
+        //get saved cv
+        CV savedCV = savedCandidate.getCvs().stream()
+                .filter(c -> c.getPath().equals(cvPath))
+                .findFirst().get();
+        return CandidateProfileResponse.CVResponse.builder()
+                .cvId(savedCV.getCvId())
+                .name(savedCV.getName())
+                .path(savedCV.getPath())
+                .active(savedCV.getActive())
                 .build();
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public class CandidateProfileRequest {
     @NotBlank
     private String fullname;
-    private String avatar;
+//    private String avatar;
     
     @Pattern(regexp = "\\d{10}")
     private String phone;
