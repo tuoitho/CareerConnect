@@ -60,4 +60,14 @@ public class CandidateProfileController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/delete-cv/{cvId}")
+    public ResponseEntity<?> deleteCV(@PathVariable Long cvId) {
+        Long candidateId = authenticationHelper.getUserId();
+        ApiResponse<CandidateProfileResponse.CVResponse> response = ApiResponse.<CandidateProfileResponse.CVResponse>builder()
+                .message("CV deleted successfully")
+                .result(candidateService.deleteCV(candidateId, cvId))
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }

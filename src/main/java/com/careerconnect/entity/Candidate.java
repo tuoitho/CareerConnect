@@ -142,4 +142,10 @@ public class Candidate extends User {
         this.cvs.add(cv);
     }
 
+    public void removeCV(CV cv) {
+        if (this.cvs == null) {
+            return;
+        }
+        this.cvs.remove(cv);
+    }
 }

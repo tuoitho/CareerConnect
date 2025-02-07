@@ -198,4 +198,22 @@ public class CandidateProfileService {
                 .active(savedCV.getActive())
                 .build();
     }
+
+    public CandidateProfileResponse.CVResponse deleteCV(Long candidateId, Long cvId) {
+        Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        CV cv = candidate.getCvs().stream()
+                .filter(c -> c.getCvId().equals(cvId))
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.CV_NOT_FOUND));
+        candidate.removeCV(cv);
+        candidateRepository.save(candidate);
+        fileStoreService.deleteFile(cv.getPath());
+        return CandidateProfileResponse.CVResponse.builder()
+                .cvId(cv.getCvId())
+                .name(cv.getName())
+                .path(cv.getPath())
+                .active(cv.getActive())
+                .build();
+    }
 }
