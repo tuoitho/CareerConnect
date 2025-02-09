@@ -6,17 +6,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CookieUtil {
     public ResponseCookie generateRefreshTokenCookie(String token) {
-        return ResponseCookie.from("refresh_token", token)
-            .httpOnly(false)
+        return ResponseCookie.from("refreshToken", token)
+            .httpOnly(true)
             .secure(false) // cho HTTPS
-            .path("/")
-            .maxAge(7 * 24 * 60 * 60) // 7 days
-            .sameSite("Lax")
+            .path("/api/refresh")
+            .maxAge(367 * 24 * 60 * 60)
             .build();
     }
 
     public ResponseCookie getCleanRefreshTokenCookie() {
-        return ResponseCookie.from("refresh_token", "")
+        return ResponseCookie.from("refreshToken", "")
             .httpOnly(true)
             .secure(true)
             .path("/")

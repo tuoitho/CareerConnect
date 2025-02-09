@@ -7,10 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/refresh")
@@ -19,7 +16,9 @@ public class RefreshTokenController {
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
     @PostMapping("")
-    public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
+    public ResponseEntity<?> refreshToken(
+//            @RequestParam String refreshToken,
+                                          @CookieValue("refreshToken") String refreshToken) {
         String username = tokenProvider.getUsernameFromToken(refreshToken);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         UsernamePasswordAuthenticationToken authentication =

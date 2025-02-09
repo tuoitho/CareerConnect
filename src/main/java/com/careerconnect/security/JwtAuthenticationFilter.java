@@ -35,8 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         final Set<String> AUTH_WHITELIST = Set.of(SecurityConfig.AUTH_WHITELIST);
         final String path = request.getServletPath();
-        Logger.log(AUTH_WHITELIST);
-        Logger.log(request.getServletPath());
         if (AUTH_WHITELIST.stream().anyMatch(pattern  -> pathMatcher.match(pattern, path))) {
             filterChain.doFilter(request, response);
             return;

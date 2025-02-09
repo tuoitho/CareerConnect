@@ -10,6 +10,8 @@ import com.careerconnect.security.JwtTokenProvider;
 import com.careerconnect.service.impl.UserService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.CookieUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -31,7 +33,7 @@ public class AuthController {
     private final AuthenticationHelper authenticationHelper;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -54,6 +56,11 @@ public class AuthController {
                 .refreshToken(refreshToken)
                 .user(loggedInUser)
                 .build();
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setPath("/api/refresh");
+        // Chỉ gửi cookie với request này
+        cookie.setMaxAge(365 * 24 * 60 * 60);
+        response.addCookie(cookie);
         return ResponseEntity.ok().body(loginResponse);
 
     }
