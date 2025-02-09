@@ -2,6 +2,7 @@ package com.careerconnect.exception;
 
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.util.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -31,6 +32,14 @@ public class HandleException {
         return ResponseEntity.status(apiResponse.getCode()).body(apiResponse);
     }
 
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    ResponseEntity<ApiResponse<?>> handlingResourceNotFoundException(ResourceNotFoundException e) {
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(404)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
+    }
     @ExceptionHandler(AuthenticationException.class)
     ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
         Logger.log("AuthenticationException: " + e.getMessage(), e.getClass().getName());
