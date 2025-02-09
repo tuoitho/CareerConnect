@@ -72,6 +72,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(x -> x.configurationSource(corsConfigurationSource()))
+
 //                .exceptionHandling(exceptionHandling -> exceptionHandling
 //                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))  // Sử dụng JwtAuthenticationEntryPoint để xử lý các yêu cầu không hợp lệ
                 .authorizeHttpRequests(auth -> auth
