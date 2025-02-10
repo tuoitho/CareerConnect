@@ -27,7 +27,10 @@ public enum ErrorCode {
     NOT_PERMITTED(403, "You are not permitted to perform this action", HttpStatus.FORBIDDEN),
     RESOURCE_MUST_BE_CREATED_OR_MODIFIED(400, "Resource must be created or modify, plz don't provide id or id must be existed", HttpStatus.BAD_REQUEST),
     CV_NOT_FOUND(404, "CV not found", HttpStatus.NOT_FOUND),
-    ;
+    ALREADY_APPLIED(400, "You have already applied for this job", HttpStatus.BAD_REQUEST),
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
     private final int code;

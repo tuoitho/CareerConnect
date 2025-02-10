@@ -1,7 +1,9 @@
 package com.careerconnect.service.impl;
 
 import com.careerconnect.dto.common.PaginatedResponse;
+import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.dto.request.CreateJobRequest;
+import com.careerconnect.dto.response.AppliedJobResponse;
 import com.careerconnect.dto.response.CreateJobResponse;
 import com.careerconnect.dto.response.MemberResponse;
 import com.careerconnect.dto.response.PostedJobDetailResponse;
@@ -9,19 +11,18 @@ import com.careerconnect.entity.*;
 import com.careerconnect.enums.JobTypeEnum;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
-import com.careerconnect.repository.ApplicationRepo;
-import com.careerconnect.repository.CompanyRepo;
-import com.careerconnect.repository.JobRepo;
-import com.careerconnect.repository.UserRepository;
+import com.careerconnect.repository.*;
 import com.careerconnect.service.PaginationService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,7 +36,32 @@ public class JobService {
     private final ApplicationRepo applicationRepo;
     private final PaginationService paginationService;
     private final CompanyRepo companyRepo;
+    private final CandidateRepo candidateRepo;
+    private final CvRepo cvRepo;
 
+    //apply job
+    @Transactional
+    public void applyJob(Long canId, ApplyJobRequest request) {
+        Candidate candidate = candidateRepo.findById(canId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Job job = jobRepository.findById(request.getJobId()).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        //check if applied
+        if (applicationRepo.existsByCandidateAndJob(candidate, job)) {
+            throw new AppException(ErrorCode.ALREADY_APPLIED);
+        }
+        CV cv = cvRepo.findById(request.getCvId()).orElseThrow(() -> new AppException(ErrorCode.CV_NOT_FOUND));
+
+        Application application = Application.builder()
+                .coverLetter(request.getCoverLetter())
+                .candidate(candidate)
+                .job(job)
+                .build();
+        ApplicationCV applicationCV = ApplicationCV.builder()
+                .name(cv.getName())
+                .path(cv.getPath())
+                .build();
+        application.assignCV(applicationCV);
+        applicationRepo.save(application);
+    }
     //create
     public CreateJobResponse createJob(Long userId, CreateJobRequest req) {
         //get company from recruiter
@@ -218,5 +244,23 @@ public class JobService {
                 .category(j.getCategory())
                 .active(j.isActive())
                 .build());
+    }
+
+    public PaginatedResponse<AppliedJobResponse> getAppliedJobs(Long candidateId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appliedAt").descending());
+        Page<Application> applications = applicationRepo.findAllByCandidate_userId(candidateId, pageable);
+        return paginationService.paginate(applications, application -> {
+            Job job = application.getJob();
+            return AppliedJobResponse.builder()
+                    .applicationId(application.getApplicationId())
+                    .coverLetter(application.getCoverLetter())
+                    .appliedAt(application.getAppliedAt())
+                    .job(AppliedJobResponse.AppliedJob.builder()
+                            .jobId(job.getJobId())
+                            .title(job.getTitle())
+                            .build())
+                    .build();
+        });
+
     }
 }

@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.LoginRequest;
 import com.careerconnect.dto.request.RegisterRequest;
@@ -7,6 +8,7 @@ import com.careerconnect.dto.response.LoginResponse;
 import com.careerconnect.entity.User;
 import com.careerconnect.security.CustomUserDetails;
 import com.careerconnect.security.JwtTokenProvider;
+import com.careerconnect.service.AuthService;
 import com.careerconnect.service.impl.UserService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.CookieUtil;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 // Tạo controller để xử lý authentication
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(ApiEndpoint.AUTH)
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationManager authenticationManager;
@@ -34,31 +36,14 @@ public class AuthController {
     private final CookieUtil cookieUtil;
     private final UserService userService;
     private final AuthenticationHelper authenticationHelper;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
-        String accessToken = tokenProvider.generateAccessToken(authentication);
-        String refreshToken = tokenProvider.generateRefreshToken(authentication);
+        LoginResponse loginResponse = authService.login(loginRequest);
 
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        String refreshToken = authService.generateRefreshToken(loginRequest);
 
-        LoginResponse.LoggedInUser loggedInUser = LoginResponse.LoggedInUser.builder()
-                .userId(user.getUserId())
-                .username(user.getUsername())
-                .role(user.getRole())
-                .build();
-
-        LoginResponse loginResponse = LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .user(loggedInUser)
-                .build();
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setPath("/");
         cookie.setMaxAge(365 * 24 * 60 * 60);
@@ -66,6 +51,7 @@ public class AuthController {
         cookie.setSecure(true); // Set to true if using HTTPS
         cookie.setAttribute("SameSite", "Lax"); // Allow the cookie to be sent with same-site requests
         response.addCookie(cookie);
+
         return ResponseEntity.ok().body(loginResponse);
 
     }

@@ -17,6 +17,7 @@ public class Application {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long applicationId;
 
+    @Column(columnDefinition = "TEXT")
     private String coverLetter;
 
     @Builder.Default
@@ -25,7 +26,7 @@ public class Application {
     @Builder.Default
     private boolean processed=false;
 
-    @OneToOne(mappedBy = "application")
+    @OneToOne(mappedBy = "application",cascade = CascadeType.ALL,orphanRemoval = true)
     private ApplicationCV applicationCV;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,5 +39,9 @@ public class Application {
     @JsonIgnore
     private Candidate candidate;
 
+    public void assignCV(ApplicationCV cv){
+        this.applicationCV=cv;
+        cv.setApplication(this);
+    }
 
 }
