@@ -2,6 +2,7 @@ package com.careerconnect.exception;
 
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.util.Logger;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@Hidden
 public class HandleException {
 
     @ExceptionHandler(value = Exception.class)

@@ -22,22 +22,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+import static com.careerconnect.constant.SecurityEndpoint.AUTH_WHITELIST;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    public static final String[] AUTH_WHITELIST = {
-            "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars/**",
-            "/api/auth/**",
-            "/api/refresh/**",
-            "/api/test2"
-    };
+
     public static final String[] REQUIRED_AUTH = {
             "/api/test"
     };

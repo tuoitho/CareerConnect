@@ -1,5 +1,6 @@
 package com.careerconnect.security;
 
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.exception.CustomJwtException;
 import com.careerconnect.util.Logger;
@@ -33,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        final Set<String> AUTH_WHITELIST = Set.of(SecurityConfig.AUTH_WHITELIST);
+        final Set<String> AUTH_WHITELIST = Set.of(SecurityEndpoint.AUTH_WHITELIST);
         final String path = request.getServletPath();
         if (AUTH_WHITELIST.stream().anyMatch(pattern  -> pathMatcher.match(pattern, path))) {
             filterChain.doFilter(request, response);

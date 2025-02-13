@@ -3,6 +3,7 @@ package com.careerconnect.controller.candidate;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
