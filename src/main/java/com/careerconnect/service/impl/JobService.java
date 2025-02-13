@@ -119,6 +119,7 @@ public class JobService {
                 .experience(job.getExperience())
                 .category(job.getCategory())
                 .active(job.isActive())
+                .companyId(job.getCompany().getCompanyId())
                 .build();
     }
 

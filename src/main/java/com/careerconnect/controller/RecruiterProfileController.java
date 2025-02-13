@@ -1,10 +1,9 @@
-package com.careerconnect.controller.recruiter;
+package com.careerconnect.controller;
 
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.RecruiterProfileRequest;
 import com.careerconnect.service.impl.RecruiterProfileService;
 import com.careerconnect.util.AuthenticationHelper;
-import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

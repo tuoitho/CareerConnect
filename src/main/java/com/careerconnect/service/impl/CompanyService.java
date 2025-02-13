@@ -170,4 +170,9 @@ public class CompanyService {
                 .inviterName(i.getInviter().getFullname())
                 .build());
     }
+
+    public CompanyResponse getCompanyById(Long id) {
+        Company company = companyRepo.findById(id).orElseThrow(() -> new AppException(ErrorCode.COMPANY_NOT_FOUND));
+        return companyMapper.toCompanyResponse(company);
+    }
 }

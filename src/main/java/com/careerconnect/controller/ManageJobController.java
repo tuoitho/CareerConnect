@@ -1,5 +1,6 @@
-package com.careerconnect.controller.recruiter;
+package com.careerconnect.controller;
 
+import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.service.impl.JobService;
@@ -10,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/recruiter/jobs")
+@RequestMapping(ApiEndpoint.PREFIX+"/recruiter/jobs")
 @RequiredArgsConstructor
-public class JobController {
+public class ManageJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;
 

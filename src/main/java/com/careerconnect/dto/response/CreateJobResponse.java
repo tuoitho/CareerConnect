@@ -25,4 +25,5 @@ public class CreateJobResponse {
     private ExpEnum experience;
     private String category;
     private boolean active;
+    private Long companyId;
 }

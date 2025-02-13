@@ -5,6 +5,7 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.LoginRequest;
 import com.careerconnect.dto.request.RegisterRequest;
 import com.careerconnect.dto.response.LoginResponse;
+import com.careerconnect.dto.response.TokenResponse;
 import com.careerconnect.entity.User;
 import com.careerconnect.security.CustomUserDetails;
 import com.careerconnect.security.JwtTokenProvider;
@@ -23,13 +24,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 // Tạo controller để xử lý authentication
 @Slf4j
 @RestController
-@RequestMapping(ApiEndpoint.AUTH)
 @RequiredArgsConstructor
+@RequestMapping(ApiEndpoint.PREFIX+"/auth")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
@@ -37,7 +40,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationHelper authenticationHelper;
     private final AuthService authService;
-
+    private final UserDetailsService userDetailsService;
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         LoginResponse loginResponse = authService.login(loginRequest);
@@ -63,6 +66,18 @@ public class AuthController {
                 .message("User registered successfully")
                 .build();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(
+//            @RequestParam String refreshToken,
+            @CookieValue("refreshToken") String refreshToken) {
+        String username = tokenProvider.getUsernameFromToken(refreshToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        String newAccessToken = tokenProvider.generateAccessToken(authentication);
+        return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
 
 }

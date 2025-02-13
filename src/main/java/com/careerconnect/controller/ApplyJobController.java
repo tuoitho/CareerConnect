@@ -1,4 +1,4 @@
-package com.careerconnect.controller.candidate;
+package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
@@ -10,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(ApiEndpoint.JOBAPPLICATION)
+@RequestMapping(ApiEndpoint.PREFIX+"/job")
 @RequiredArgsConstructor
-public class JobApplicationController  {
+public class ApplyJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;
 
@@ -39,9 +39,4 @@ public class JobApplicationController  {
                 .build();
         return ResponseEntity.ok(response);
     }
-//    @GetMapping("/candidates/applications/{applicationId}")
-//    public ResponseEntity<ApplicationDto> getApplicationDetails(@PathVariable Long applicationId) {
-//        // Logic lấy chi tiết đơn ứng tuyển
-//        return ResponseEntity.ok(applicationService.getApplicationDetails(applicationId));
-//    }
 }
