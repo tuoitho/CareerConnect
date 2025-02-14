@@ -26,7 +26,7 @@ public class ManageCompanyController {
                 .build();
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/members")
+    @GetMapping("/mycompany/members")
     public ResponseEntity<?> getMembers(@RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "2") int size) {
         ApiResponse<?> response = ApiResponse.builder()
@@ -59,7 +59,7 @@ public class ManageCompanyController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/mycompany")
     public ResponseEntity<?> updateCompany(@ModelAttribute RegisterCompanyRequest registerCompanyRequest) {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Company updated successfully")

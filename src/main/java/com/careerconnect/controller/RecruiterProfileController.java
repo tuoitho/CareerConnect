@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.RecruiterProfileRequest;
 import com.careerconnect.service.impl.RecruiterProfileService;
@@ -9,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/recruiter/profile")
+@RequestMapping(ApiEndpoint.PREFIX+"/recruiter/profile")
 @RequiredArgsConstructor
 public class RecruiterProfileController {
     private final RecruiterProfileService recruiterProfileService;
