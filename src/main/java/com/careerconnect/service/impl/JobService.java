@@ -5,7 +5,7 @@ import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.dto.response.AppliedJobResponse;
 import com.careerconnect.dto.response.CreateJobResponse;
-import com.careerconnect.dto.response.MemberResponse;
+import com.careerconnect.dto.response.JobDetailResponse;
 import com.careerconnect.dto.response.PostedJobDetailResponse;
 import com.careerconnect.entity.*;
 import com.careerconnect.enums.JobTypeEnum;
@@ -13,12 +13,10 @@ import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.repository.*;
 import com.careerconnect.service.PaginationService;
-import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -103,9 +101,10 @@ public class JobService {
                 .build();
     }
 
-    public CreateJobResponse getJobById(Long id) {
+    public JobDetailResponse getJobDetailById(Long candidateId, Long id) {
         Job job = jobRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
-        return CreateJobResponse.builder()
+        boolean isApplied = applicationRepo.existsByCandidate_userIdAndJob_jobId(candidateId, id);
+        return JobDetailResponse.builder()
                 .jobId(job.getJobId())
                 .title(job.getTitle())
                 .description(job.getDescription())
@@ -120,6 +119,7 @@ public class JobService {
                 .category(job.getCategory())
                 .active(job.isActive())
                 .companyId(job.getCompany().getCompanyId())
+                .applied(isApplied)
                 .build();
     }
 

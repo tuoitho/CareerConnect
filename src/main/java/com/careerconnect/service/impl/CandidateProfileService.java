@@ -27,6 +27,7 @@ public class CandidateProfileService {
     private final Cloudinary cloudinary;
     private final ImageService imageService;
     private final FileStoreService fileStoreService;
+    private final CvRepo cvRepo;
 
     @Transactional
     public CandidateProfileResponse getProfile(Long candidateId) {
@@ -215,5 +216,17 @@ public class CandidateProfileService {
                 .path(cv.getPath())
                 .active(cv.getActive())
                 .build();
+    }
+
+    public Set<CandidateProfileResponse.CVResponse> getCVs(Long candidateId) {
+        Set<CV> cvs = cvRepo.findByCandidate_UserId(candidateId).orElseThrow(() -> new AppException(ErrorCode.CV_NOT_FOUND));
+        return cvs.stream()
+                .map(cv -> CandidateProfileResponse.CVResponse.builder()
+                        .cvId(cv.getCvId())
+                        .name(cv.getName())
+                        .path(cv.getPath())
+                        .active(cv.getActive())
+                        .build())
+                .collect(Collectors.toSet());
     }
 }

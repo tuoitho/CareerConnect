@@ -2,6 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.response.JobDetailResponse;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,8 @@ public class ViewJobController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getDetailJobById(@PathVariable Long id) {
-        var job = jobService.getJobById(id);
+        Long candidateId = authenticationHelper.getUserId();
+        JobDetailResponse job = jobService.getJobDetailById(candidateId,id);
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Job retrieved successfully")
                 .result(job)

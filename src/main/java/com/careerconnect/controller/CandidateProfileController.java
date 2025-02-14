@@ -49,6 +49,16 @@ public class CandidateProfileController {
         return ResponseEntity.ok(response);
     }
 
+    //get all my CV
+    @GetMapping("/cv")
+    public ResponseEntity<?> getCVs() {
+        Long candidateId = authenticationHelper.getUserId();
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("CVs retrieved successfully")
+                .result(candidateService.getCVs(candidateId))
+                .build();
+        return ResponseEntity.ok(response);
+    }
     @PostMapping(value = "/cv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadCV(@RequestPart String cvName,
                                       @RequestParam("file") MultipartFile file) {
