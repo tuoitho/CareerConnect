@@ -35,4 +35,14 @@ public class ViewJobController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchJobs(@RequestParam String query, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
+        var jobs = jobService.searchJobs(query, page, size);
+        ApiResponse<?> response = ApiResponse.builder()
+                .message("Jobs retrieved successfully")
+                .result(jobs)
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }

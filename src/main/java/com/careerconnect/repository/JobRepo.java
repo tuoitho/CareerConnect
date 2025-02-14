@@ -12,4 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface JobRepo extends JpaRepository<Job, Long> {
     Page<Job> findAllByCompany(Company company,Pageable pageable);
     Page<Job> findAllByCompanyAndActiveTrue(Company company,Pageable pageable);
+
+    Page<Job> findAllByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String query, String query1, Pageable pageable);
 }

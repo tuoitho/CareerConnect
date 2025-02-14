@@ -3,10 +3,7 @@ package com.careerconnect.service.impl;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.dto.request.CreateJobRequest;
-import com.careerconnect.dto.response.AppliedJobResponse;
-import com.careerconnect.dto.response.CreateJobResponse;
-import com.careerconnect.dto.response.JobDetailResponse;
-import com.careerconnect.dto.response.PostedJobDetailResponse;
+import com.careerconnect.dto.response.*;
 import com.careerconnect.entity.*;
 import com.careerconnect.enums.JobTypeEnum;
 import com.careerconnect.exception.AppException;
@@ -263,5 +260,19 @@ public class JobService {
                     .build();
         });
 
+    }
+
+    public PaginatedResponse<SearchJobItemResponse> searchJobs(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Job> jobs = jobRepository.findAllByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query, pageable);
+        return paginationService.paginate(jobs, job -> SearchJobItemResponse.builder()
+                .jobId(job.getJobId())
+                .title(job.getTitle())
+                .location(job.getLocation())
+                .minSalary(job.getMinSalary())
+                .maxSalary(job.getMaxSalary())
+                .companyName(job.getCompany().getName())
+                .companyLogo(job.getCompany().getLogo())
+                .build());
     }
 }
