@@ -5,6 +5,7 @@ import com.careerconnect.dto.response.RecruiterProfileResponse;
 import com.careerconnect.entity.Recruiter;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.RecruiterRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +20,7 @@ public class RecruiterProfileService {
 
     //  Cập nhật hồ sơ của recruiter
     public RecruiterProfileResponse updateProfile(Long userId,RecruiterProfileRequest req) {
-        Recruiter recruiter = recruiterRepo.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = recruiterRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         recruiter.setPassword(passwordEncoder.encode(req.getPassword()));
         recruiter.setFullname(req.getFullname());
         recruiter.setContact(req.getContact());
@@ -36,7 +37,7 @@ public class RecruiterProfileService {
 
     // Lấy thông tin hồ sơ của recruiter
     public RecruiterProfileResponse getProfile(Long userId) {
-        Recruiter recruiter = recruiterRepo.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = recruiterRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         return RecruiterProfileResponse.builder()
                 .username(recruiter.getUsername())
                 .password(recruiter.getPassword())

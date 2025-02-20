@@ -13,6 +13,7 @@ import com.careerconnect.entity.Invitation;
 import com.careerconnect.entity.Recruiter;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.mapper.CompanyMapper;
 import com.careerconnect.mapper.InvitationMapper;
 import com.careerconnect.repository.CompanyRepo;
@@ -54,16 +55,16 @@ public class CompanyService {
     private final RecruiterRepo recruiterRepo;
 
     public CompanyResponse getCurrentCompany(Long userId) {
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
         }
         return companyMapper.toCompanyResponse(company);
     }
 
     public CompanyResponse registerCompany(Long userId, RegisterCompanyRequest registerCompanyRequest) {
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         if (recruiter.getCompany() != null) {
             throw new AppException(ErrorCode.COMPANY_ALREADY_REGISTERED);
         }
@@ -77,10 +78,10 @@ public class CompanyService {
 
 
     public CompanyResponse updateCompany(Long userId, RegisterCompanyRequest registerCompanyRequest) {
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
         }
         companyMapper.updateCompany(company, registerCompanyRequest);
         if (registerCompanyRequest.getLogo() != null)
@@ -90,10 +91,10 @@ public class CompanyService {
     }
 
     public void addMember(Long userId, AddMemberRequest addMemberRequest) {
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
         }
         //create a link to invite member
         String token = UUID.randomUUID().toString();
@@ -117,7 +118,7 @@ public class CompanyService {
     }
 
     public InvitationResponse accept(Long userId, String token) {
-        Invitation invitation = invitationRepository.findByToken(token).orElseThrow(() -> new AppException(ErrorCode.INVITATION_NOT_FOUND));
+        Invitation invitation = invitationRepository.findByToken(token).orElseThrow(() -> new ResourceNotFoundException(RoleService.class, "token", token));
         if (!Objects.equals(userId, invitation.getInviter().getUserId())) {
             throw new AppException(ErrorCode.INVALID_INVITATION);
         }
@@ -125,7 +126,7 @@ public class CompanyService {
             throw new AppException(ErrorCode.INVITATION_EXPIRED);
         }
         Company company = invitation.getCompany();
-        Recruiter recruiter = (Recruiter) userRepository.findById(invitation.getInviter().getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(invitation.getInviter().getUserId()).orElseThrow(() -> new ResourceNotFoundException(RoleService.class, invitation.getInviter().getUserId()));
         recruiter.setCompany(company);
         userRepository.save(recruiter);
         invitation.setAccepted(true);
@@ -134,14 +135,14 @@ public class CompanyService {
     }
 
     public InvitationResponse getInvitation(String token) {
-        Invitation invitation = invitationRepository.findByToken(token).orElseThrow(() -> new AppException(ErrorCode.INVITATION_NOT_FOUND));
+        Invitation invitation = invitationRepository.findByToken(token).orElseThrow(() -> new ResourceNotFoundException(RoleService.class, "token", token));
         return invitationMapper.toInvitationResponse(invitation);
     }
 
 
     public PaginatedResponse<MemberResponse> getMembers(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
             throw new AppException(ErrorCode.NOT_IN_COMPANY);
@@ -156,7 +157,7 @@ public class CompanyService {
 
     public PaginatedResponse<AllInvitationResponse> getInvitations(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(RoleService.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
             throw new AppException(ErrorCode.NOT_IN_COMPANY);
@@ -172,7 +173,7 @@ public class CompanyService {
     }
 
     public CompanyResponse getCompanyById(Long id) {
-        Company company = companyRepo.findById(id).orElseThrow(() -> new AppException(ErrorCode.COMPANY_NOT_FOUND));
+        Company company = companyRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(Company.class, id));
         return companyMapper.toCompanyResponse(company);
     }
 }

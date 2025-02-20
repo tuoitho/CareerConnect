@@ -6,9 +6,11 @@ import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX+"/job")
 @RequiredArgsConstructor
@@ -29,8 +31,10 @@ public class ApplyJobController {
     //get list job đã apply
     @GetMapping("/applied")
     public ResponseEntity<?> getAppliedJobs(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0", required = false) int page,
+            @RequestParam(defaultValue = "10", required = false) int size) {
+        log.info("Get applied jobs");
+
         // Logic lấy danh sách job đã apply
         Long candidateId = authenticationHelper.getUserId();
         ApiResponse<?> response = ApiResponse.builder()

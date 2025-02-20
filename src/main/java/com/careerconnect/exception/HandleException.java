@@ -19,7 +19,7 @@ public class HandleException {
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception e) {
         ApiResponse<?> apiResponse = new ApiResponse<>();
         apiResponse.setMessage(e.getMessage());
-        apiResponse.setCode(400);
+        apiResponse.setCode(500);
         e.printStackTrace();
         return ResponseEntity.badRequest().body(apiResponse);
     }
@@ -31,38 +31,40 @@ public class HandleException {
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();
-        return ResponseEntity.status(apiResponse.getCode()).body(apiResponse);
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
     ResponseEntity<ApiResponse<?>> handlingResourceNotFoundException(ResourceNotFoundException e) {
         ApiResponse<?> apiResponse = ApiResponse.builder()
-                .code(404)
+                .code(25252)
                 .message(e.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
     }
     @ExceptionHandler(AuthenticationException.class)
     ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
-        Logger.log("AuthenticationException: " + e.getMessage(), e.getClass().getName());
         String errorMessage;
         int code;
+        HttpStatus status = HttpStatus.FORBIDDEN;
         if (e instanceof BadCredentialsException) {
             errorMessage = "Sai tên đăng nhập hoặc mật khẩu.";
-            code = 500;
+            code = 10000;
+            status = HttpStatus.BAD_REQUEST;
         } else if (e instanceof LockedException) {
             errorMessage = "Tài khoản của bạn đã bị khóa.";
-            code = 403;
+            code = 10001;
         } else {
             errorMessage = "Đã xảy ra lỗi không xác định";
-            code = 500;
+            code = 99999;
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
         ApiResponse<?> response = ApiResponse.builder()
                 .code(code)
                 .message(errorMessage)
                 .build();
-        return ResponseEntity.status(code).body(response);
+        return ResponseEntity.status(status).body(response);
     }
 
 }

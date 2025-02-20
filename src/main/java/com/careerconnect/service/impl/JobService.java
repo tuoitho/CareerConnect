@@ -8,6 +8,7 @@ import com.careerconnect.entity.*;
 import com.careerconnect.enums.JobTypeEnum;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.*;
 import com.careerconnect.service.PaginationService;
 import com.careerconnect.util.Logger;
@@ -37,13 +38,14 @@ public class JobService {
     //apply job
     @Transactional
     public void applyJob(Long canId, ApplyJobRequest request) {
-        Candidate candidate = candidateRepo.findById(canId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Job job = jobRepository.findById(request.getJobId()).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+
+        Candidate candidate = candidateRepo.findById(canId).orElseThrow(() -> new ResourceNotFoundException(Candidate.class, canId));
+        Job job = jobRepository.findById(request.getJobId()).orElseThrow(() -> new ResourceNotFoundException(Job.class, request.getJobId()));
         //check if applied
         if (applicationRepo.existsByCandidateAndJob(candidate, job)) {
             throw new AppException(ErrorCode.ALREADY_APPLIED);
         }
-        CV cv = cvRepo.findById(request.getCvId()).orElseThrow(() -> new AppException(ErrorCode.CV_NOT_FOUND));
+        CV cv = cvRepo.findById(request.getCvId()).orElseThrow(() -> new ResourceNotFoundException(CV.class, request.getCvId()));
 
         Application application = Application.builder()
                 .coverLetter(request.getCoverLetter())
@@ -60,10 +62,11 @@ public class JobService {
     //create
     public CreateJobResponse createJob(Long userId, CreateJobRequest req) {
         //get company from recruiter
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+//            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
+                throw new AppException(ErrorCode.NO_LINKED_COMPANY);        
         }
         //create job
         Job job = Job.builder()
@@ -99,7 +102,7 @@ public class JobService {
     }
 
     public JobDetailResponse getJobDetailById(Long candidateId, Long id) {
-        Job job = jobRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        Job job = jobRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Job.class, id));
         boolean isApplied = applicationRepo.existsByCandidate_userIdAndJob_jobId(candidateId, id);
         return JobDetailResponse.builder()
                 .jobId(job.getJobId())
@@ -121,7 +124,7 @@ public class JobService {
     }
 
     public PostedJobDetailResponse getPostedJobDetail(Long jobId) {
-        Job job = jobRepository.findById(jobId).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResourceNotFoundException(Job.class, jobId));
         List<Application> applications = applicationRepo.findAllByJob(job);
         List<PostedJobDetailResponse.ApplicationWithCandidate> applicationWithCandidates = applications.stream().map(application -> {
             Candidate candidate = application.getCandidate();
@@ -139,12 +142,12 @@ public class JobService {
     }
 
     public CreateJobResponse updateJob(Long userId, Long id, CreateJobRequest job) {
-        Job jobToUpdate = jobRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        Job jobToUpdate = jobRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Job.class, id));
         //get company from recruiter
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
         }
         if (!jobToUpdate.getCompany().equals(company)) {
             throw new AppException(ErrorCode.NOT_PERMITTED);
@@ -178,12 +181,12 @@ public class JobService {
     }
 
     public void deleteJob(Long userId, Long id) {
-        Job job = jobRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        Job job = jobRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Job.class, id));
         //get company from recruiter
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
         }
         if (!job.getCompany().equals(company)) {
             throw new AppException(ErrorCode.NOT_PERMITTED);
@@ -198,10 +201,10 @@ public class JobService {
     }
 
     public PaginatedResponse<CreateJobResponse> getJobs(Long userId,int page, int size) {
-        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
         if (company == null) {
-            throw new AppException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new AppException(ErrorCode.NO_LINKED_COMPANY);
         }
         Pageable pageable = PageRequest.of(page, size);
         Page<Job> jobs = jobRepository.findAllByCompany(company, pageable);
@@ -224,7 +227,7 @@ public class JobService {
     }
 
     public PaginatedResponse<CreateJobResponse> getCompanyJobs(Long companyId, int page, int size) {
-        Company company = companyRepo.findById(companyId).orElseThrow(() -> new AppException(ErrorCode.COMPANY_NOT_FOUND));
+        Company company = companyRepo.findById(companyId).orElseThrow(() -> new ResourceNotFoundException(Company.class, companyId));
         Pageable pageable = PageRequest.of(page, size);
         Page<Job> jobs = jobRepository.findAllByCompanyAndActiveTrue(company, pageable);
         return paginationService.paginate(jobs, j -> CreateJobResponse.builder()
@@ -256,6 +259,7 @@ public class JobService {
                     .job(AppliedJobResponse.AppliedJob.builder()
                             .jobId(job.getJobId())
                             .title(job.getTitle())
+                            .image(job.getCompany().getLogo())
                             .build())
                     .build();
         });

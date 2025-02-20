@@ -18,6 +18,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 // Tạo controller để xử lý authentication
 @Slf4j
@@ -42,8 +48,8 @@ public class AuthController {
     private final AuthService authService;
     private final UserDetailsService userDetailsService;
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        LoginResponse loginResponse = authService.login(loginRequest);
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, @RequestParam(value = "tk") String token, HttpServletResponse response) {
+        LoginResponse loginResponse = authService.login(loginRequest,token);
 
         String refreshToken = authService.generateRefreshToken(loginRequest);
 
@@ -79,5 +85,6 @@ public class AuthController {
         String newAccessToken = tokenProvider.generateAccessToken(authentication);
         return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
+
 
 }

@@ -12,8 +12,7 @@ import org.springframework.util.MultiValueMap;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiResponse<T>{
-    @Builder.Default
-    private int code = 200;
+    private Integer code;
     private String message;
     private T result;
 

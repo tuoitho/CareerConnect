@@ -39,6 +39,7 @@ public class AppliedJobResponse {
     public static class AppliedJob {
         private Long jobId;
         private String title;
+        private String image;
     }
 
 }

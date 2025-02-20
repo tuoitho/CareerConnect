@@ -5,6 +5,7 @@ import com.careerconnect.dto.response.CandidateProfileResponse;
 import com.careerconnect.entity.*;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
+import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.*;
 import com.careerconnect.service.FileStoreService;
 import com.careerconnect.service.ImageService;
@@ -32,7 +33,7 @@ public class CandidateProfileService {
     @Transactional
     public CandidateProfileResponse getProfile(Long candidateId) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
         Set<CandidateProfileResponse.EducationResponse> educations = candidate.getEducations().stream()
                 .map(edu -> CandidateProfileResponse.EducationResponse.builder()
                         .school(edu.getSchool())
@@ -80,7 +81,7 @@ public class CandidateProfileService {
     @Transactional
     public CandidateProfileResponse updateProfile(Long candidateId, CandidateProfileRequest request, MultipartFile avatar) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
 
         BeanUtils.copyProperties(request, candidate, "skills","educations", "experiences", "cvs");
         Set<Skill> skills = request.getSkills().stream()
@@ -179,7 +180,7 @@ public class CandidateProfileService {
 
     public CandidateProfileResponse.CVResponse uploadCV(Long candidateId, String cvName, MultipartFile file) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
         String cvPath = fileStoreService.uploadPdf(file);
         CV cv = CV.builder()
                 .name(cvName)
@@ -202,11 +203,11 @@ public class CandidateProfileService {
 
     public CandidateProfileResponse.CVResponse deleteCV(Long candidateId, Long cvId) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
         CV cv = candidate.getCvs().stream()
                 .filter(c -> c.getCvId().equals(cvId))
                 .findFirst()
-                .orElseThrow(() -> new AppException(ErrorCode.CV_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(CV.class, cvId));
         candidate.removeCV(cv);
         candidateRepository.save(candidate);
         fileStoreService.deleteFile(cv.getPath());
@@ -219,7 +220,7 @@ public class CandidateProfileService {
     }
 
     public Set<CandidateProfileResponse.CVResponse> getCVs(Long candidateId) {
-        Set<CV> cvs = cvRepo.findByCandidate_UserId(candidateId).orElseThrow(() -> new AppException(ErrorCode.CV_NOT_FOUND));
+        Set<CV> cvs = cvRepo.findByCandidate_UserId(candidateId).orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
         return cvs.stream()
                 .map(cv -> CandidateProfileResponse.CVResponse.builder()
                         .cvId(cv.getCvId())
