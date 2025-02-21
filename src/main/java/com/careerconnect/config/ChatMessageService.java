@@ -13,7 +13,7 @@ public class ChatMessageService {
     private final ChatMessageRepo chatMessageRepo;
 
     public List<ChatMessageResponse> getMessages(Long senderId, Long recipientId) {
-        List<ChatMessage> messages = chatMessageRepo.findAllBySender_userIdAndRecipient_userIdOrSender_userIdAndRecipient_userId(senderId, recipientId, recipientId, senderId);
+        List<ChatMessage> messages = chatMessageRepo.findAllBySender_userIdAndRecipient_userIdOrSender_userIdAndRecipient_userIdOrderByTimestampAsc(senderId, recipientId, recipientId, senderId);
         return messages.stream().map(
                 message -> ChatMessageResponse.builder()
                         .id(message.getId())

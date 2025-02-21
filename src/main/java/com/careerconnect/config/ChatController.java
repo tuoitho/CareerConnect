@@ -20,7 +20,7 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageRepo messageRepository;
     private final UserRepository userRepository;
-
+    private final WebSocketEventListener webSocketEventListener; // Inject để kiểm tra online
     @MessageMapping("/chat.send")
     public void sendMessage(
             @Payload ChatMessageDTO messageDTO,
@@ -36,12 +36,17 @@ public class ChatController {
         );
         saveMessage(messageDTO);
 
+
     }
 
     public void saveMessage(ChatMessageDTO messageDto) {
         ChatMessage message = convertToEntity(messageDto);
         Long tempId = messageDto.getTempId(); // Lấy ID tạm thời từ client
         message.setTimestamp(LocalDateTime.now()); // Đặt timestamp hiện tại
+        // Kiểm tra recipient có online không
+        if (webSocketEventListener.isUserOnline(messageDto.getRecipientId())) {
+            message.setStatus(MessageStatus.DELIVERED);
+        }
         message = messageRepository.save(message); // Lưu vào DB
         ChatMessageDTO messageDTO = ChatMessageDTO.builder()
                 .id(message.getId())
@@ -58,6 +63,17 @@ public class ChatController {
         messageRepository.findById(req.getMessageId()).ifPresent(msg -> {
             msg.setStatus(MessageStatus.READ);
             messageRepository.save(msg);
+        });
+    }
+
+    @MessageMapping("/chat.markAsDelivered")
+    public void markAsDelivered(@Payload MarkAsDeliveredMessageRequest req) {
+        Logger.log("Mark as delivered: " + req);
+        messageRepository.findById(req.getMessageId()).ifPresent(msg -> {
+            if (msg.getStatus() == MessageStatus.SENT) {
+                msg.setStatus(MessageStatus.DELIVERED);
+                messageRepository.save(msg);
+            }
         });
     }
 
