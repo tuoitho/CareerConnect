@@ -9,12 +9,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class ChatController {
     private final UserRepository userRepository;
 
     @MessageMapping("/chat.send")
-    public void sendMessage(SimpMessageHeaderAccessor sha,
+    public void sendMessage(
             @Payload ChatMessageDTO messageDTO,
             Principal principal
     ) {
@@ -36,12 +34,28 @@ public class ChatController {
                 "/queue/messages",
                 messageDTO
         );
+        saveMessage(messageDTO);
 
     }
 
+    public void saveMessage(ChatMessageDTO messageDto) {
+        ChatMessage message = convertToEntity(messageDto);
+        Long tempId = messageDto.getTempId(); // Lấy ID tạm thời từ client
+        message.setTimestamp(LocalDateTime.now()); // Đặt timestamp hiện tại
+        message = messageRepository.save(message); // Lưu vào DB
+        ChatMessageDTO messageDTO = ChatMessageDTO.builder()
+                .id(message.getId())
+                .tempId(tempId)
+                .senderId(message.getSender().getUserId())
+                .recipientId(message.getRecipient().getUserId())
+                .content(message.getContent())
+                .build();
+        messagingTemplate.convertAndSend("/topic/chat.messageSaved", messageDTO);
+    }
+
     @MessageMapping("/chat.markAsRead")
-    public void markAsRead(@Payload Long messageId) {
-        messageRepository.findById(messageId).ifPresent(msg -> {
+    public void markAsRead(@Payload MarkAsReadRequest req) {
+        messageRepository.findById(req.getMessageId()).ifPresent(msg -> {
             msg.setStatus(MessageStatus.READ);
             messageRepository.save(msg);
         });
