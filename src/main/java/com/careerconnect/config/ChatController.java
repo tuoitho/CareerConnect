@@ -33,7 +33,6 @@ public class ChatController {
 
         messagingTemplate.convertAndSendToUser(
                 messageDTO.getRecipientId().toString(),
-//                "6",
                 "/queue/messages",
                 messageDTO
         );
