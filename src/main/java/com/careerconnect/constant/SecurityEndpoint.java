@@ -10,6 +10,7 @@ public class SecurityEndpoint {
             "/webjars/**",
             "/api/auth/**",
             "/api/refresh/**",
+            "/ws-chat/**",
             "/api/test2"
     };
     public static final String[] REQUIRED_AUTH = {
