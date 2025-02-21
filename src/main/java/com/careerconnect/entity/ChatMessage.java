@@ -2,13 +2,11 @@ package com.careerconnect.entity;
 
 import com.careerconnect.enums.MessageStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,5 +27,7 @@ public class ChatMessage {
     
     private String content;
     private LocalDateTime timestamp;
-    private MessageStatus status; // SENT, DELIVERED, READ
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private MessageStatus status=MessageStatus.SENT; // SENT, DELIVERED, READ
 }

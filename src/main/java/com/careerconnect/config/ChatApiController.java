@@ -20,17 +20,6 @@ public class ChatApiController {
         this.chatMessageRepo = chatMessageRepo;
     }
 
-    @GetMapping("/history")
-    public List<ChatMessage> getChatHistory(
-        @RequestParam Long userId,
-        @RequestParam(required = false) Integer page 
-    ) {
-        // Pagination và filtering
-        //tam thoi get tat ca message
-        Long myId=authenticationHelper.getUserId();
-        return chatMessageRepo.findAllBySender_userIdAndRecipient_userIdOrSender_userIdAndRecipient_userId(myId,userId,userId,myId);
-
-    }
     
     @PostMapping("/upload-file")
     public void handleFileUpload(
