@@ -32,10 +32,10 @@ public class ChatController {
         Logger.log("nguoi gui pricipal",principal.getName());
 
         messagingTemplate.convertAndSendToUser(
-//                messageDTO.getRecipientId().toString(),
-                "e",
+                messageDTO.getRecipientId().toString(),
+//                "6",
                 "/queue/messages",
-                messageDTO.getContent()
+                messageDTO
         );
 
     }

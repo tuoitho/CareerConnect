@@ -1,5 +1,6 @@
 package com.careerconnect.config;
 
+import com.careerconnect.security.CustomUserDetails;
 import com.careerconnect.security.CustomUserDetailsService;
 import com.careerconnect.security.JwtTokenProvider;
 import com.careerconnect.util.Logger;
@@ -106,17 +107,13 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
                     if (tokenProvider.validateToken(token)) {
                         String username = tokenProvider.getUsernameFromToken(token);
                         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
                         // Tạo Principal từ UserDetails
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities()
                         );
                         // Đặt Principal trực tiếp vào accessor
-                        accessor.setUser(new Principal() {
-                            @Override
-                            public String getName() {
-                                return username;
-                            }
-                        });
+                        accessor.setUser(() -> customUserDetails.getUserId().toString());
                     } else {
                         Logger.log("Token validation failed for " + accessor.getCommand());
                     }
