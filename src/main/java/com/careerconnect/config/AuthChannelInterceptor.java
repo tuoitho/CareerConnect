@@ -79,17 +79,52 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 //            }
 //        }
 //        return message;
+//        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+//
+//        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+//            Object raw = message.getHeaders().get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
+//
+//            if (raw instanceof Map) {
+//                Object name = ((Map) raw).get("username");
+//
+//                if (name instanceof ArrayList) {
+//                    accessor.setUser(new User(((ArrayList<String>) name).get(0).toString()));
+//                }
+//            }
+//        }
+//        return message;
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            String token;
             Object raw = message.getHeaders().get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
-
-            if (raw instanceof Map) {
-                Object name = ((Map) raw).get("username");
-
-                if (name instanceof ArrayList) {
-                    accessor.setUser(new User(((ArrayList<String>) name).get(0).toString()));
+            String tk2 = (String) ((ArrayList) ((Map) raw).get("Authorization")).get(0);
+            try {
+                if (StringUtils.hasText(tk2) && tk2.startsWith("Bearer ")) {
+                    token=tk2;
+                    token = token.substring(7);
+                    if (tokenProvider.validateToken(token)) {
+                        String username = tokenProvider.getUsernameFromToken(token);
+                        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                        // Tạo Principal từ UserDetails
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities()
+                        );
+                        // Đặt Principal trực tiếp vào accessor
+                        accessor.setUser(new Principal() {
+                            @Override
+                            public String getName() {
+                                return username;
+                            }
+                        });
+                    } else {
+                        Logger.log("Token validation failed for " + accessor.getCommand());
+                    }
+                } else {
+                    Logger.log("No valid Bearer token found for " + accessor.getCommand());
                 }
+            } catch (Exception ex) {
+                Logger.log("Error during WebSocket authentication for " + accessor.getCommand() + ": " + ex.getMessage());
             }
         }
         return message;

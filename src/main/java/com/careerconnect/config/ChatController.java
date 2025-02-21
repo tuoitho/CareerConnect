@@ -29,12 +29,11 @@ public class ChatController {
             Principal principal
     ) {
         Logger.log("msgdto",messageDTO);
-        Logger.log("principal",sha.getUser());
+        Logger.log("nguoi gui pricipal",principal.getName());
 
         messagingTemplate.convertAndSendToUser(
 //                messageDTO.getRecipientId().toString(),
-                "a",
-
+                "e",
                 "/queue/messages",
                 messageDTO.getContent()
         );
