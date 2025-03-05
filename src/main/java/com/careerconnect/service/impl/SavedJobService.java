@@ -1,13 +1,16 @@
-package com.careerconnect.atest;
+package com.careerconnect.service.impl;
 
+import com.careerconnect.dto.response.SavedJobResponseDTO;
 import com.careerconnect.entity.Candidate;
 import com.careerconnect.entity.Job;
 
+import com.careerconnect.entity.SavedJob;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.CandidateRepo;
 import com.careerconnect.repository.JobRepo;
+import com.careerconnect.repository.SavedJobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

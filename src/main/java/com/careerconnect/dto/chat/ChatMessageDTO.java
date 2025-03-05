@@ -1,9 +1,7 @@
-package com.careerconnect.config;
+package com.careerconnect.dto.chat;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 
 @Data

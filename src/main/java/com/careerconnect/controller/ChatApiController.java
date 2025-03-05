@@ -1,15 +1,13 @@
-package com.careerconnect.config;
+package com.careerconnect.controller;
 
+import com.careerconnect.repository.ChatMessageRepo;
 import com.careerconnect.dto.common.ApiResponse;
-import com.careerconnect.dto.response.UserChatResponse;
 import com.careerconnect.service.impl.ChatService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat")

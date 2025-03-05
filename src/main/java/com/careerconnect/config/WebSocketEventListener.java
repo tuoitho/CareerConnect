@@ -1,9 +1,7 @@
 package com.careerconnect.config;
 
-import com.careerconnect.dto.other.UserStatusMessage;
-import com.careerconnect.repository.UserRepository;
+import com.careerconnect.dto.chat.UserStatusMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;

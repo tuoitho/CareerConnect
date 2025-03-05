@@ -1,4 +1,4 @@
-package com.careerconnect.config;
+package com.careerconnect.repository;
 
 import com.careerconnect.entity.ChatMessage;
 import com.careerconnect.entity.User;

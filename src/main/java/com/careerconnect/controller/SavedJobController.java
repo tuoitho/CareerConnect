@@ -1,12 +1,12 @@
-package com.careerconnect.atest;
+package com.careerconnect.controller;
 
 
+import com.careerconnect.dto.response.SavedJobResponseDTO;
+import com.careerconnect.service.impl.SavedJobService;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

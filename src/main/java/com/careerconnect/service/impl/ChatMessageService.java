@@ -1,6 +1,8 @@
-package com.careerconnect.config;
+package com.careerconnect.service.impl;
 
+import com.careerconnect.dto.chat.ChatMessageResponse;
 import com.careerconnect.entity.ChatMessage;
+import com.careerconnect.repository.ChatMessageRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

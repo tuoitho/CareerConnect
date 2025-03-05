@@ -1,4 +1,4 @@
-package com.careerconnect.config;
+package com.careerconnect.dto.chat;
 
 import lombok.Data;
 

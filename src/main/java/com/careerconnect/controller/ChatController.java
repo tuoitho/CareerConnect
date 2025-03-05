@@ -1,7 +1,12 @@
-package com.careerconnect.config;
+package com.careerconnect.controller;
 
+import com.careerconnect.config.*;
+import com.careerconnect.dto.chat.ChatMessageDTO;
+import com.careerconnect.dto.chat.MarkAsDeliveredMessageRequest;
+import com.careerconnect.dto.chat.MarkAsReadRequest;
 import com.careerconnect.entity.ChatMessage;
 import com.careerconnect.enums.MessageStatus;
+import com.careerconnect.repository.ChatMessageRepo;
 import com.careerconnect.repository.UserRepository;
 import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;

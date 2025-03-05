@@ -1,6 +1,6 @@
 package com.careerconnect.service.impl;
 
-import com.careerconnect.atest.SavedJobRepository;
+import com.careerconnect.repository.SavedJobRepository;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.dto.request.CreateJobRequest;

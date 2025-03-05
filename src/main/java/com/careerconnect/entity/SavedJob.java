@@ -1,7 +1,5 @@
-package com.careerconnect.atest;
+package com.careerconnect.entity;
 
-import com.careerconnect.entity.Candidate;
-import com.careerconnect.entity.Job;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

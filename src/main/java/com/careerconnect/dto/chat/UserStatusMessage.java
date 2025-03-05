@@ -1,4 +1,4 @@
-package com.careerconnect.dto.other;
+package com.careerconnect.dto.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

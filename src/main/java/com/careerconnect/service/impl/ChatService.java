@@ -1,17 +1,15 @@
 package com.careerconnect.service.impl;
 
-import com.careerconnect.config.ChatMessageRepo;
+import com.careerconnect.repository.ChatMessageRepo;
 import com.careerconnect.config.WebSocketEventListener;
 import com.careerconnect.dto.response.UserChatResponse;
 import com.careerconnect.entity.Candidate;
-import com.careerconnect.entity.ChatMessage;
 import com.careerconnect.entity.Recruiter;
 import com.careerconnect.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

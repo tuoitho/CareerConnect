@@ -1,5 +1,6 @@
-package com.careerconnect.config;
+package com.careerconnect.controller;
 
+import com.careerconnect.service.impl.ChatMessageService;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.util.AuthenticationHelper;

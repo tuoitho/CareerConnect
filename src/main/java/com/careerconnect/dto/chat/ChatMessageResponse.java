@@ -1,6 +1,5 @@
-package com.careerconnect.config;
+package com.careerconnect.dto.chat;
 
-import com.careerconnect.entity.ChatMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
