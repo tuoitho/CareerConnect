@@ -54,6 +54,7 @@ public class ChatController {
                 .senderId(message.getSender().getUserId())
                 .recipientId(message.getRecipient().getUserId())
                 .content(message.getContent())
+                .status(message.getStatus().name())
                 .build();
         messagingTemplate.convertAndSend("/topic/chat.messageSaved", messageDTO);
     }
@@ -63,16 +64,17 @@ public class ChatController {
         messageRepository.findById(req.getMessageId()).ifPresent(msg -> {
             msg.setStatus(MessageStatus.READ);
             messageRepository.save(msg);
+            messagingTemplate.convertAndSend("/topic/chat.markAsRead", req); // Thông báo "Đã đọc"
         });
     }
 
     @MessageMapping("/chat.markAsDelivered")
     public void markAsDelivered(@Payload MarkAsDeliveredMessageRequest req) {
-        Logger.log("Mark as delivered: " + req);
         messageRepository.findById(req.getMessageId()).ifPresent(msg -> {
             if (msg.getStatus() == MessageStatus.SENT) {
                 msg.setStatus(MessageStatus.DELIVERED);
                 messageRepository.save(msg);
+                messagingTemplate.convertAndSend("/topic/chat.markAsDelivered", req); // Thông báo "Đã nhận"
             }
         });
     }

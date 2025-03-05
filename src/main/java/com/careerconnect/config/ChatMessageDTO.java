@@ -15,6 +15,6 @@ public class ChatMessageDTO {
     private String content;
     private String type;
     private Long tempId;
-
+    private String status;
     // validation annotations 
 }

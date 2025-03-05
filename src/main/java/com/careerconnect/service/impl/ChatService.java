@@ -1,6 +1,7 @@
 package com.careerconnect.service.impl;
 
 import com.careerconnect.config.ChatMessageRepo;
+import com.careerconnect.config.WebSocketEventListener;
 import com.careerconnect.dto.response.UserChatResponse;
 import com.careerconnect.entity.Candidate;
 import com.careerconnect.entity.ChatMessage;
@@ -18,6 +19,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ChatService {
     private final ChatMessageRepo chatMessageRepo;
+    private final WebSocketEventListener webSocketEventListener;
 
     public List<UserChatResponse> getRecruitersForCandidate(Long candidateId) {
         Set<User> recruiters = chatMessageRepo.findUsersHavingMessageHistory(candidateId);
@@ -29,6 +31,7 @@ public class ChatService {
                             .id(recruiter.getUserId())
                         .name(recruiter.getUsername())
                         .avatar(recruiter.getCompany().getLogo())
+                    .active(webSocketEventListener.isUserOnline(recruiter.getUserId())) // Thêm trạng thái active
                                 .build();
             recruiterDTOs.add(recruiterDTO);
         }
@@ -46,6 +49,7 @@ public class ChatService {
                     .id(candidate.getUserId())
                     .name(candidate.getUsername())
                     .avatar(candidate.getAvatar())
+                    .active(webSocketEventListener.isUserOnline(candidate.getUserId())) // Thêm trạng thái active
                     .build();
             candidateDTOs.add(candidateDTO);
         }

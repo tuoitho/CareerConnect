@@ -9,4 +9,5 @@ public class UserChatResponse {
     private Long id;
     private String name;
     private String avatar;
+    private boolean active;
 }

@@ -15,6 +15,6 @@ public interface CandidateRepo extends JpaRepository<Candidate, Long> {
             "LEFT JOIN FETCH c.educations " +
             "LEFT JOIN FETCH c.experiences " +
             "LEFT JOIN FETCH c.cvs " +
-            "WHERE c.id = :id")
+            "WHERE c.userId = :id")
     Optional<Candidate> findByIdWithRelations(@Param("id") Long id);
 }
