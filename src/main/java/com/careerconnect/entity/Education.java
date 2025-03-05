@@ -9,6 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@Table(name = "education")
 public class Education {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

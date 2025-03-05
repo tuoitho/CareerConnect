@@ -10,6 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@Table(name = "experience")
 public class Experience {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

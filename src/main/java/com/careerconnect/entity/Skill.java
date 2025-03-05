@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Data
+@Table(name = "skill")
 public class Skill {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

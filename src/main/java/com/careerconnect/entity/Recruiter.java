@@ -20,7 +20,6 @@ public class Recruiter extends User{
     private boolean isRepresentative; // Có phải người đại diện không
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
     private Company company;
 
     @OneToMany(mappedBy = "inviter", cascade = CascadeType.ALL, orphanRemoval = true)

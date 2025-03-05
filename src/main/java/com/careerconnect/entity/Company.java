@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@Table(name = "company")
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

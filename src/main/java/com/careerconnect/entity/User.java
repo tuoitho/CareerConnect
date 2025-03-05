@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "[User]")
+@Table(name = "[user]")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class User {
     @Id
