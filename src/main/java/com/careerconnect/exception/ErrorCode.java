@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+//    mã lỗi ở đây là tự định nghĩa, không phải mã lỗi HTTP, ví dụ F02 của shoppe đó?
     USERNAME_EXISTED( "Username is already taken", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED( "Email is already taken", HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(10003, "You need to log in to perform this action.", HttpStatus.UNAUTHORIZED),
@@ -24,6 +25,7 @@ public enum ErrorCode {
     ALREADY_APPLIED(42452, "You have already applied for this job", HttpStatus.BAD_REQUEST),
     ROBOT_DETECTED( 85252, "You are a robot", HttpStatus.BAD_REQUEST),
 
+    JOB_ALREADY_SAVED( 85252, "Job already saved", HttpStatus.BAD_REQUEST),
             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

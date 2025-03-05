@@ -1,5 +1,6 @@
 package com.careerconnect.service.impl;
 
+import com.careerconnect.atest.SavedJobRepository;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.dto.request.CreateJobRequest;
@@ -34,6 +35,7 @@ public class JobService {
     private final CompanyRepo companyRepo;
     private final CandidateRepo candidateRepo;
     private final CvRepo cvRepo;
+    private final SavedJobRepository savedJobRepository;
 
     //apply job
     @Transactional
@@ -101,9 +103,11 @@ public class JobService {
                 .build();
     }
 
+    //dành cho candidate
     public JobDetailResponse getJobDetailById(Long candidateId, Long id) {
         Job job = jobRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Job.class, id));
         boolean isApplied = applicationRepo.existsByCandidate_userIdAndJob_jobId(candidateId, id);
+        boolean isSaved = savedJobRepository.existsByCandidate_userIdAndJob_jobId(candidateId, id);
         return JobDetailResponse.builder()
                 .jobId(job.getJobId())
                 .title(job.getTitle())
@@ -120,6 +124,7 @@ public class JobService {
                 .active(job.isActive())
                 .companyId(job.getCompany().getCompanyId())
                 .applied(isApplied)
+                .saved(isSaved)
                 .build();
     }
 

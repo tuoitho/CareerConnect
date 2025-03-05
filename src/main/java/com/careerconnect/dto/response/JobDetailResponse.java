@@ -29,4 +29,5 @@ public class JobDetailResponse {
     private boolean active;
     private Long companyId;
     private boolean applied;
+    private boolean saved;
 }
