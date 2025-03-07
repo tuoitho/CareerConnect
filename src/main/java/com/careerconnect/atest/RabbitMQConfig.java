@@ -38,7 +38,9 @@ public class RabbitMQConfig {
     public Binding binding(Queue queue, TopicExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
-
+//    Bạn có thể bỏ đoạn này nếu:
+//             Bạn chỉ làm việc với chuỗi đơn giản (String) thay vì đối tượng JSON.
+//            Bạn đang gửi/nhận message bằng byte array (byte[]).
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
