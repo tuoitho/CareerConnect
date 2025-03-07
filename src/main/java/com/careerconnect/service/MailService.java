@@ -1,6 +1,7 @@
 package com.careerconnect.service;
 
 import com.careerconnect.dto.common.MailDTO;
+import com.careerconnect.util.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,5 +20,6 @@ public class MailService {
         message.setSubject(mailDTO.getSubject());
         message.setText(mailDTO.getText());
         javaMailSender.send(message);
+        Logger.log("Mail sent to " + mailDTO.getTo());
     }
 }

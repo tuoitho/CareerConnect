@@ -10,6 +10,7 @@ import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.*;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -90,6 +91,7 @@ public class JobService2 {
         List<JobAlertSubscription> matchingSubscriptions = subscriptions.stream()
                 .filter(sub -> jobContent.toLowerCase().contains(sub.getKeyword().toLowerCase()))
                 .toList();
+        Logger.log("Job notification found: " + matchingSubscriptions.size());
         for (JobAlertSubscription subscription : matchingSubscriptions) {
             JobAlertMessage message = JobAlertMessage.builder()
                     .candidateId(subscription.getCandidate().getUserId())
