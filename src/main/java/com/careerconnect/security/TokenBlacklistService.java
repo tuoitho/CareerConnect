@@ -14,7 +14,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TokenBlacklistService {
     private final RedisTemplate<String, String> redisTemplate;
-    private final JwtTokenProvider jwtTokenProvider;
 
     public void addRefreshTokenToBlacklist(String token) {
         redisTemplate.opsForValue().set(token, "blacklisted", Duration.ofDays(30)); // Vi thoi gian song cua refresh token la 30 ngay
