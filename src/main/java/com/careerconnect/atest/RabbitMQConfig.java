@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableRabbit
+//@EnableRabbit   Spring Boot da bat mac dinh roi ?
 public class RabbitMQConfig {
 
     @Value("${careerconnect.rabbitmq.exchange}")

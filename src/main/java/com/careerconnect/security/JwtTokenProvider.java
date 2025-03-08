@@ -1,8 +1,12 @@
 package com.careerconnect.security;
 
 import com.careerconnect.exception.CustomJwtException;
+import com.careerconnect.util.Logger;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,13 +19,16 @@ import java.util.Date;
 
 // Tạo class để xử lý JWT
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+    private final TokenBlacklistService tokenBlacklistService;
     @Value("${jwt.jwtSecret}")
     private String jwtSecret;
     @Value("${jwt.jwtExpirationInMs}")
     private long jwtExpirationInMs;
     @Value("${jwt.jwtRefreshExpirationInMs}")
     private long jwtRefreshExpirationInMs;
+
 
     public String generateAccessToken(Authentication authentication) {
         Date now = new Date();
@@ -36,6 +43,15 @@ public class JwtTokenProvider {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
+    public Date getExpirationDateFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getExpiration();
+    }
+
     public String getTokenType(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -71,12 +87,17 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
+
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            //check black list
+            if (tokenBlacklistService.isBlacklisted(token)) {
+                throw new CustomJwtException("Token is blacklisted");
+            }
             return true;
         } catch (SignatureException signatureException) {
             throw new CustomJwtException("Invalid JWT signature");
-        } catch (MalformedJwtException malformedJwtException) {
+        } catch (MalformedJwtException | DecodingException malformedJwtException) {
             throw new CustomJwtException("Invalid JWT token");
         } catch (ExpiredJwtException expiredJwtException) {
             throw new CustomJwtException("Expired JWT token");

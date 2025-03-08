@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -28,41 +29,44 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
-//    private final UserDetailsService userDetailsService;
+    //    private final UserDetailsService userDetailsService;
     private final CustomUserDetailsService customUserDetailsService;
     private final ObjectMapper objectMapper;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         final Set<String> AUTH_WHITELIST = Set.of(SecurityEndpoint.AUTH_WHITELIST);
         final String path = request.getServletPath();
-        if (AUTH_WHITELIST.stream().anyMatch(pattern  -> pathMatcher.match(pattern, path))) {
+        if (AUTH_WHITELIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path))) {
             filterChain.doFilter(request, response);
             return;
         }
         try {
             String token = getJwtFromRequest(request);
-            if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-                String username = tokenProvider.getUsernameFromToken(token);
+            // Xac thuc token
+            tokenProvider.validateToken(token);
+
+            String username = tokenProvider.getUsernameFromToken(token);
 //                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             filterChain.doFilter(request, response);
-        } catch (Exception ex) {
-            handleJwtError(response, ex);
+        } catch (CustomJwtException e) {
+            // ⚠️ Ghi trực tiếp phản hồi, không để Spring Security xử lý
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write(objectMapper.writeValueAsString(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .build()
+            ));
         }
     }
 
-    private void handleJwtError(HttpServletResponse response, Exception e) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        ApiResponse<?> error = new ApiResponse<>(401, e.getMessage(), null);
-        objectMapper.writeValue(response.getWriter(), error);
-        response.flushBuffer();
-    }
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
