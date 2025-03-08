@@ -8,6 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+
+
+//this is a Middleware Bean for solving the problem of circular dependency
 @Configuration
 public class UserDetailsServiceConfig {
 
