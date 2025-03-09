@@ -23,7 +23,7 @@ public class Job {
     private String description;
     private String location;
     @Enumerated(EnumType.STRING)
-    private JobTypeEnum type;
+    private JobTypeEnum type;  //FULL_TIME,    PART_TIME,    CONTRACT,    INTERNSHIP,    TEMPORARY,    VOLUNTEER,    FREELANCE
 //    range of salary
     private String minSalary;
     private String maxSalary;
@@ -36,6 +36,8 @@ public class Job {
     private ExpEnum experience;
 
     private String category;
+
+    private String area;
 
     @Builder.Default
     private boolean active = true;

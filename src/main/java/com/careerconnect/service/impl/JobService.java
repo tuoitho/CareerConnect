@@ -213,13 +213,13 @@ public class JobService {
         }
         Pageable pageable = PageRequest.of(page, size);
         Page<Job> jobs = jobRepository.findAllByCompany(company, pageable);
-        Logger.log("Jobs: " + jobs.getContent());
         return paginationService.paginate(jobs, j -> CreateJobResponse.builder()
                 .jobId(j.getJobId())
                 .title(j.getTitle())
                 .description(j.getDescription())
                 .location(j.getLocation())
                 .type(JobTypeEnum.valueOf(j.getType().name()))
+                .experience(j.getExperience())
                 .minSalary(j.getMinSalary())
                 .maxSalary(j.getMaxSalary())
                 .created(j.getCreated())

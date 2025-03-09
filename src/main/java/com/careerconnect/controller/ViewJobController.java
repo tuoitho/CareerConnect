@@ -2,9 +2,13 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.JobDetailResponse;
+import com.careerconnect.dto.response.JobResponse;
 import com.careerconnect.service.impl.JobService;
+import com.careerconnect.service.impl.SearchJobService;
 import com.careerconnect.util.AuthenticationHelper;
+import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class ViewJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;
+    private final SearchJobService searchJobService;
+
     @GetMapping("")
     public ResponseEntity<?> getCompanyJobs(@RequestParam Long companyId, @RequestParam int page, @RequestParam int size) {
         var jobs = jobService.getCompanyJobs(companyId, page, size);
@@ -45,4 +51,6 @@ public class ViewJobController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+
 }
