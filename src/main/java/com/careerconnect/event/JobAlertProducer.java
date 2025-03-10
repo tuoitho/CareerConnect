@@ -18,7 +18,7 @@ public class JobAlertProducer {
     private final JobAlertSubscriptionRepo jobAlertSubscriptionRepo;
     private final RabbitTemplate rabbitTemplate; // Thêm RabbitTemplate
 
-    @Value("${careerconnect.rabbitmq.exchange}")
+    @Value("${careerconnect.rabbitmq.topic.exchange}")
     private String exchange;
 
     @Value("${careerconnect.rabbitmq.routingkey}")

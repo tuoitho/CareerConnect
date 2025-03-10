@@ -1,5 +1,7 @@
-package com.careerconnect.atest2;
+package com.careerconnect.controller;
 
+import com.careerconnect.dto.response.NotificationResponse;
+import com.careerconnect.service.impl.NotificationService;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;

@@ -1,7 +1,10 @@
-package com.careerconnect.atest2;
+package com.careerconnect.service.impl;
 
+import com.careerconnect.dto.response.NotificationResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
+import com.careerconnect.entity.Notification;
 import com.careerconnect.exception.ResourceNotFoundException;
+import com.careerconnect.repository.NotificationRepository;
 import com.careerconnect.service.PaginationService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +30,7 @@ public class NotificationService {
     public PaginatedResponse<NotificationResponse> getNotifications(int page, int size) {
         Long userId = authenticationHelper.getUserId();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Notification> notifications = notificationRepository.findByUser_UserId(userId, pageable);
+        Page<Notification> notifications = notificationRepository.findByUser_UserIdOrderByCreatedAtDesc(userId, pageable);
 
         return paginationService.paginate(notifications, notification -> NotificationResponse.builder()
                 .id(notification.getId())

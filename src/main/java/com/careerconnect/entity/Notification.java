@@ -1,6 +1,5 @@
-package com.careerconnect.atest2;
+package com.careerconnect.entity;
 
-import com.careerconnect.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,4 +35,11 @@ public class Notification {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // Liên kết với user nhận thông báo
+
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        isRead = false;
+    }
 }

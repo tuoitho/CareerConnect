@@ -1,6 +1,7 @@
 package com.careerconnect.service.impl;
 
 import com.careerconnect.event.JobAlertProducer;
+import com.careerconnect.event.JobApplicationProducer;
 import com.careerconnect.repository.SavedJobRepository;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
@@ -38,6 +39,7 @@ public class JobService {
     private final CvRepo cvRepo;
     private final SavedJobRepository savedJobRepository;
     private final JobAlertProducer jobAlertProducer;
+    private final JobApplicationProducer jobApplicationProducer;
 
     //apply job
     @Transactional
@@ -65,7 +67,10 @@ public class JobService {
                 .path(cv.getPath())
                 .build();
         application.assignCV(applicationCV);
-        applicationRepo.save(application);
+
+        application=applicationRepo.save(application);
+        jobApplicationProducer.notifyJobApplication(application);
+
     }
     //create
     public CreateJobResponse createJob(Long userId, CreateJobRequest req) {
