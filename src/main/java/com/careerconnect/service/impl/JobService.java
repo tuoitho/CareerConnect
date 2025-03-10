@@ -47,6 +47,10 @@ public class JobService {
         if (applicationRepo.existsByCandidateAndJob(candidate, job)) {
             throw new AppException(ErrorCode.ALREADY_APPLIED);
         }
+        //check if deadline
+        if (job.getDeadline().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.JOB_DEADLINE);
+        }
         CV cv = cvRepo.findById(request.getCvId()).orElseThrow(() -> new ResourceNotFoundException(CV.class, request.getCvId()));
 
         Application application = Application.builder()

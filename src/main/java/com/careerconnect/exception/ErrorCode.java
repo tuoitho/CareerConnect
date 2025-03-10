@@ -26,7 +26,12 @@ public enum ErrorCode {
     ROBOT_DETECTED( 85252, "You are a robot", HttpStatus.BAD_REQUEST),
 
     JOB_ALREADY_SAVED( 85252, "Job already saved", HttpStatus.BAD_REQUEST),
-            ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    JOB_DEADLINE( 85252, "Job deadline has passed", HttpStatus.BAD_REQUEST),
+
+
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
         this.code = null;
