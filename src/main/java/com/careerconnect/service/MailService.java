@@ -20,6 +20,5 @@ public class MailService {
         message.setSubject(mailDTO.getSubject());
         message.setText(mailDTO.getText());
         javaMailSender.send(message);
-        Logger.log("Mail sent to " + mailDTO.getTo());
     }
 }

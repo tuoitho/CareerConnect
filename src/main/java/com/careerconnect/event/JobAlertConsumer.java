@@ -1,7 +1,8 @@
-package com.careerconnect.atest;
+package com.careerconnect.event;
 
 import com.careerconnect.config.WebSocketEventListener;
 import com.careerconnect.dto.common.MailDTO;
+import com.careerconnect.dto.other.JobAlertMessage;
 import com.careerconnect.service.MailService;
 import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
@@ -22,22 +23,22 @@ public class JobAlertConsumer {
         String notificationMethod = message.getNotificationMethod();
 
         // Gửi qua WebSocket nếu user online và phương thức cho phép
-        if (webSocketEventListener.isUserOnline(candidateId) &&
-                ("WEBSOCKET".equals(notificationMethod) || "BOTH".equals(notificationMethod))) {
-            messagingTemplate.convertAndSendToUser(
-                    candidateId.toString(),
-                    "/queue/job-alerts",
-                    "New job matching your keyword '" + message.getKeyword() + "': " + message.getJobTitle()
-            );
-        }
+//        if (webSocketEventListener.isUserOnline(candidateId) &&
+//                ("WEBSOCKET".equals(notificationMethod) || "BOTH".equals(notificationMethod))) {
+//            messagingTemplate.convertAndSendToUser(
+//                    candidateId.toString(),
+//                    "/queue/job-alerts",
+//                    "New job matching your keyword '" + message.getKeyword() + "': " + message.getJobTitle()
+//            );
+//        }
 
         // Gửi qua email nếu phương thức cho phép
-        if ("EMAIL".equals(notificationMethod) || "BOTH".equals(notificationMethod)) {
+        if ("EMAIL".equals(notificationMethod)) {
             Logger.log("Job alert received: " + message);
             MailDTO mailDTO = MailDTO.builder()
                     .from("no-reply@careerconnect.com")
                     .to(message.getEmail())
-                    .subject("New Job Alert: " + message)
+                    .subject("Việc làm mới phù hợp với từ khóa '" + message.getKeyword() + "' vua được đăng")
                     .text("A new job matching your keyword '" + message.getKeyword() + "' has been posted:\n" +
                             "Title: " + message.getJobTitle() + "\n" +
                             "Location: " + message.getJobLocation() + "\n" +

@@ -1,6 +1,5 @@
-package com.careerconnect.atest;
+package com.careerconnect.entity;
 
-import com.careerconnect.entity.Candidate;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +22,8 @@ public class JobAlertSubscription {
     private String keyword;
 
     @Column(nullable = false)
-    private String notificationMethod; // "EMAIL", "WEBSOCKET", hoặc "BOTH"
+    @Builder.Default
+    private String notificationMethod = "EMAIL";
 
     @Column(nullable = false)
     @Builder.Default

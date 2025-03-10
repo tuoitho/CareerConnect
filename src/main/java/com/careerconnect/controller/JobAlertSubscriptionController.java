@@ -1,7 +1,9 @@
-package com.careerconnect.atest;
+package com.careerconnect.controller;
 
+import com.careerconnect.service.impl.JobAlertSubscriptionService;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.request.JobAlertSubscriptionRequest;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,15 @@ public class JobAlertSubscriptionController {
         jobAlertSubscriptionService.unsubscribe(candidateId, subscriptionId);
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Unsubscribed from job alerts successfully")
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getJobAlertSubscriptions() {
+        Long candidateId = authenticationHelper.getUserId();
+        ApiResponse<?> response = ApiResponse.builder()
+                .result(jobAlertSubscriptionService.getJobAlertSubscriptions(candidateId))
                 .build();
         return ResponseEntity.ok(response);
     }

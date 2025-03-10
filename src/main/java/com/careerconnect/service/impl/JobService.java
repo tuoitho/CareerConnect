@@ -1,5 +1,6 @@
 package com.careerconnect.service.impl;
 
+import com.careerconnect.event.JobAlertProducer;
 import com.careerconnect.repository.SavedJobRepository;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
@@ -36,6 +37,7 @@ public class JobService {
     private final CandidateRepo candidateRepo;
     private final CvRepo cvRepo;
     private final SavedJobRepository savedJobRepository;
+    private final JobAlertProducer jobAlertProducer;
 
     //apply job
     @Transactional
@@ -90,6 +92,9 @@ public class JobService {
                 .company(company)
                 .build();
         Job savedJob = jobRepository.save(job);
+
+        // Gửi thông điệp vào RabbitMQ
+        jobAlertProducer.notifySubscribers(job);
         return CreateJobResponse.builder()
                 .jobId(savedJob.getJobId())
                 .title(savedJob.getTitle())
