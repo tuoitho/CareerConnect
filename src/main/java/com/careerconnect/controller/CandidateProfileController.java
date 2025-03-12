@@ -1,8 +1,10 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.dto.response.SimpleCandidateResponse;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.CandidateProfileRequest;
+import com.careerconnect.dto.response.CandidateDetailResponse;
 import com.careerconnect.dto.response.CandidateProfileResponse;
 import com.careerconnect.service.impl.CandidateProfileService;
 import com.careerconnect.util.AuthenticationHelper;
@@ -78,5 +80,27 @@ public class CandidateProfileController {
                 .result(candidateService.deleteCV(candidateId, cvId))
                 .build();
         return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/{candidateId}")
+    public ResponseEntity<?> getCandidateDetail(@PathVariable Long candidateId) {
+        CandidateDetailResponse response = candidateService.getCandidateDetail(candidateId);
+
+        ApiResponse<CandidateDetailResponse> apiResponse = ApiResponse.<CandidateDetailResponse>builder()
+                .result(response)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/chat/{candidateId}")
+    public ResponseEntity<?> getCandidateForChat(@PathVariable Long candidateId) {
+        SimpleCandidateResponse response = candidateService.getCandidateForChat(candidateId);
+        ApiResponse<SimpleCandidateResponse> apiResponse = ApiResponse.<SimpleCandidateResponse>builder()
+                .result(response)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 }

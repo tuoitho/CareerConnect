@@ -1,10 +1,10 @@
 package com.careerconnect.service.impl;
 
+import com.careerconnect.dto.response.SimpleCandidateResponse;
 import com.careerconnect.dto.request.CandidateProfileRequest;
+import com.careerconnect.dto.response.CandidateDetailResponse;
 import com.careerconnect.dto.response.CandidateProfileResponse;
 import com.careerconnect.entity.*;
-import com.careerconnect.exception.AppException;
-import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.*;
 import com.careerconnect.service.FileStoreService;
@@ -78,14 +78,15 @@ public class CandidateProfileService {
                 .cvs(cvs)
                 .build();
     }
+
     @Transactional
     public CandidateProfileResponse updateProfile(Long candidateId, CandidateProfileRequest request, MultipartFile avatar) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
                 .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
 
-        BeanUtils.copyProperties(request, candidate, "skills","educations", "experiences", "cvs");
+        BeanUtils.copyProperties(request, candidate, "skills", "educations", "experiences", "cvs");
         Set<Skill> skills = request.getSkills().stream()
-                .map(skill ->Skill.builder()
+                .map(skill -> Skill.builder()
                         .skillId(null)
                         .name(skill)
                         .candidate(candidate)
@@ -188,7 +189,7 @@ public class CandidateProfileService {
                 .candidate(candidate)
                 .build();
         candidate.addCV(cv);
-        Candidate savedCandidate=candidateRepository.save(candidate);
+        Candidate savedCandidate = candidateRepository.save(candidate);
         //get saved cv
         CV savedCV = savedCandidate.getCvs().stream()
                 .filter(c -> c.getPath().equals(cvPath))
@@ -229,5 +230,64 @@ public class CandidateProfileService {
                         .active(cv.getActive())
                         .build())
                 .collect(Collectors.toSet());
+    }
+
+
+    public CandidateDetailResponse getCandidateDetail(Long candidateId) {
+        Candidate candidate = (Candidate) candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
+
+        // Ánh xạ Education
+        Set<CandidateDetailResponse.EducationResponse> educationResponses = candidate.getEducations()
+                .stream()
+                .map(edu -> CandidateDetailResponse.EducationResponse.builder()
+                        .educationId(edu.getEducationId())
+                        .school(edu.getSchool())
+                        .major(edu.getMajor())
+                        .degree(edu.getDegree())
+                        .startDate(edu.getStartDate())
+                        .endDate(edu.getEndDate())
+                        .description(edu.getDescription())
+                        .gpa(edu.getGpa())
+                        .type(edu.getType())
+                        .build())
+                .collect(Collectors.toSet());
+
+        // Ánh xạ Experience
+        Set<CandidateDetailResponse.ExperienceResponse> experienceResponses = candidate.getExperiences()
+                .stream()
+                .map(exp -> CandidateDetailResponse.ExperienceResponse.builder()
+                        .experienceId(exp.getExperienceId())
+                        .companyName(exp.getCompanyName())
+                        .position(exp.getPosition())
+                        .startDate(exp.getStartDate())
+                        .endDate(exp.getEndDate())
+                        .description(exp.getDescription())
+                        .build())
+                .collect(Collectors.toSet());
+
+        return CandidateDetailResponse.builder()
+                .candidateId(candidate.getUserId())
+                .fullname(candidate.getFullname())
+                .avatar(candidate.getAvatar())
+                .phone(candidate.getPhone())
+                .email(candidate.getEmail())
+                .bio(candidate.getBio())
+                .skills(candidate.getSkills().stream().map(Skill::getName).collect(Collectors.toSet()))
+                .educations(educationResponses)
+                .experiences(experienceResponses)
+                .build();
+
+    }
+
+    public SimpleCandidateResponse getCandidateForChat(Long candidateId) {
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
+        return SimpleCandidateResponse.builder()
+                .id(candidate.getUserId())
+                .name(candidate.getFullname())
+                .avatar(candidate.getAvatar())
+                .build();
+
     }
 }
