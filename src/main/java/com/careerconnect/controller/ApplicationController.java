@@ -1,7 +1,14 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.dto.response.ApplicationDetailResponse;
+import com.careerconnect.service.impl.ApplicationService;
 import com.careerconnect.constant.ApiEndpoint;
+import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,4 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ApiEndpoint.PREFIX+"/application")
 @RequiredArgsConstructor
 public class ApplicationController {
+    private final ApplicationService applicationService;
+    private final AuthenticationHelper authenticationHelper;
+
+    @GetMapping("/{applicationId}")
+    public ResponseEntity<?> getApplicationDetail(@PathVariable Long applicationId) {
+        Long recruiterId = authenticationHelper.getUserId();
+        ApplicationDetailResponse response = applicationService.getApplicationDetail(recruiterId, applicationId);
+
+        ApiResponse<ApplicationDetailResponse> apiResponse = ApiResponse.<ApplicationDetailResponse>builder()
+                .message("Application details retrieved successfully")
+                .result(response)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }
