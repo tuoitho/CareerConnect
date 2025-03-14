@@ -27,6 +27,7 @@
         <url/>
     </scm>
     <properties>
+        <maven.compiler.release>21</maven.compiler.release>
         <java.version>21</java.version>
         <projectlombok-lombok.version>1.18.30</projectlombok-lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
