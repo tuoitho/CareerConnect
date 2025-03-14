@@ -30,7 +30,6 @@ public class ManageCompanyController {
     public ResponseEntity<?> getMembers(@RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "2") int size) {
         ApiResponse<?> response = ApiResponse.builder()
-                .message("Lấy thông tin thành công")
                 .result(companyService.getMembers(authenticationHelper.getUserId(),page,size))
                 .build();
         return ResponseEntity.ok(response);

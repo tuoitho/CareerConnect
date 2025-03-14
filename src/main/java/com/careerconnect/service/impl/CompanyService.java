@@ -149,9 +149,12 @@ public class CompanyService {
         }
         Page<Recruiter> recruiters = recruiterRepo.findAllByCompany(company, pageable);
         return paginationService.paginate(recruiters, r -> MemberResponse.builder()
+                .id(r.getUserId())
+                .avatar(r.getCompany().getLogo())
                 .email(r.getEmail())
                 .fullname(r.getFullname())
                 .contact(r.getContact())
+                .role(r.isRepresentative() ? "representative" : "member")
                 .build());
     }
 
