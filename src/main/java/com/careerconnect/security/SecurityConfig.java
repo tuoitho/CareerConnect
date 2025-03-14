@@ -48,7 +48,11 @@ public class SecurityConfig {
                 "http://localhost:3003",
                 "http://localhost:3004",
                 "http://localhost:3005",
-                "http://localhost:3006"
+                "http://localhost:3006",
+                "https://careerconnect-rho.vercel.app",
+                "careerconnect-rho.vercel.app",
+               "careerconnect-git-develop-tuoithos-projects.vercel.app",
+                "careerconnect-ij2d7d41w-tuoithos-projects.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
