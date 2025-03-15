@@ -1,0 +1,11 @@
+# Chỉ định môi trường
+[phases.setup]
+nixPkgs = ['jdk21', 'maven']
+
+# Build phase
+[phases.build]
+cmd = 'mvn clean package -DskipTests'
+
+# Start phase
+[start]
+cmd = 'java -jar target/*.jar'
