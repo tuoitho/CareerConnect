@@ -21,7 +21,7 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: 'java21'
+          java-version: 'JAVA|21-java21'
           distribution: 'microsoft'
 
       - name: Build with Maven
