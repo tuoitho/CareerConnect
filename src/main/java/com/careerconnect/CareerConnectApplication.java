@@ -13,7 +13,7 @@ public class CareerConnectApplication {
 
     public static void main(String[] args) {
         loadDotenv();
-//        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         SpringApplication.run(CareerConnectApplication.class, args);
     }
 
