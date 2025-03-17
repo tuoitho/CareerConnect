@@ -21,4 +21,6 @@ public interface ApplicationRepo extends JpaRepository<Application, Long> {
     Page<Application> findAllByCandidate_userId(Long candidateId, Pageable pageable);
 
     boolean existsByCandidate_userIdAndJob_jobId(Long candidateId, Long id);
+
+    Long countApplicationByJob_JobId(Long jobId);
 }

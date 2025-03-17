@@ -53,4 +53,14 @@ public class ViewJobController {
     }
 
 
+    @PostMapping("/{jobId}/view-applicants")
+    public ResponseEntity<?> viewApplicants(@PathVariable Long jobId) {
+        Long userId = authenticationHelper.getUserId();
+        Long responseData = jobService.viewApplicants(userId, jobId);
+
+        ApiResponse<?> response = ApiResponse.builder()
+                .result(responseData)
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }

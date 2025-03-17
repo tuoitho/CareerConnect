@@ -298,4 +298,17 @@ public class JobService {
                 .companyLogo(job.getCompany().getLogo())
                 .build());
     }
+
+    public Long viewApplicants(Long userId, Long jobId) {
+//        check balace
+        User user=userRepository.findById(userId).get();
+        int balance=user.getCoinBalance();
+        if (balance<1){
+            throw new AppException(ErrorCode.INSUFFICIENT_BALANCE);
+        }
+//        trù tiền
+        user.setCoinBalance(balance-1);
+        userRepository.save(user);
+        return applicationRepo.countApplicationByJob_JobId(jobId);
+    }
 }

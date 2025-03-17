@@ -29,9 +29,11 @@ public enum ErrorCode {
     JOB_DEADLINE( 85252, "Job deadline has passed", HttpStatus.BAD_REQUEST),
 
 
+    INSUFFICIENT_BALANCE( 85252, "Insufficient balance", HttpStatus.BAD_REQUEST),
 
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
         this.code = null;
