@@ -1,12 +1,14 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.JobResponse;
 import com.careerconnect.service.impl.SearchJobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping(ApiEndpoint.PREFIX+"/search")
 @Controller
 @RequiredArgsConstructor
+@PreAuthorize(SecurityEndpoint.CANDIDATE)
 public class SearchJobController {
     private final SearchJobService searchJobService;
 

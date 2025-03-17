@@ -13,9 +13,38 @@ public class SecurityEndpoint {
             "/ws-chat/**",
             "/api/test2",
             "/api/vnpay/payment-return",
+            "/api/company/jobs/search",
+            "/chat.send",
+        "/chat.markAsDelivered",
+        "/chat.markAsRead",
 //            "/api/vnpay/**",
     };
-    public static final String[] REQUIRED_AUTH = {
-            "/api/test"
-    };
+    public static final String CANDIDATE = "hasRole('CANDIDATE')";
+    public static final String RECRUITER = "hasRole('RECRUITER')";
+    public static final String BOTH = "hasAnyRole('CANDIDATE','RECRUITER')";
+    public static final String ADMIN = "hasRole('ADMIN')";
+//    public static final String[] CANDIDATE_AUTH = {
+//        "/api/job/apply" ,
+//        "/api/job/applied",
+//        "/api/job/**",
+//        "/api/candidate/profile/me",
+//        "/api/candidate/profile/cv/**",
+//        "/api/candidate/profile/chat/**",
+//        "/api/chat/**",
+//        "/chat.send",
+//        "/chat.markAsDelivered",
+//        "/chat.markAsRead"
+//    };
+//    public static final String[] RECRUITER_AUTH = {
+//            "/api/application",
+//            "/api/chat/**",
+//            "/api/candidate/profile/{id}",
+//            "/chat.send",
+//            "/chat.markAsDelivered",
+//            "/chat.markAsRead"
+//
+//    };
+//    public static final String[] REQUIRED_AUTH = {
+//            "/api/test"
+//    };
 }

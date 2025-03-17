@@ -27,6 +27,7 @@ public class ChatService {
             Recruiter recruiter = (Recruiter) user;
             UserChatResponse recruiterDTO = UserChatResponse.builder()
                             .id(recruiter.getUserId())
+                    .fullname(recruiter.getFullname())
                         .name(recruiter.getUsername())
                         .avatar(recruiter.getCompany().getLogo())
                     .active(webSocketEventListener.isUserOnline(recruiter.getUserId())) // Thêm trạng thái active
@@ -46,6 +47,7 @@ public class ChatService {
             UserChatResponse candidateDTO = UserChatResponse.builder()
                     .id(candidate.getUserId())
                     .name(candidate.getUsername())
+                    .fullname(candidate.getFullname())
                     .avatar(candidate.getAvatar())
                     .active(webSocketEventListener.isUserOnline(candidate.getUserId())) // Thêm trạng thái active
                     .build();

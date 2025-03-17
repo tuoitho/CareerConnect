@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.SimpleCandidateResponse;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +27,7 @@ public class CandidateProfileController {
     private final CandidateProfileService candidateService;
     private final AuthenticationHelper authenticationHelper;
 
+    @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<CandidateProfileResponse>> getProfile() {
         Long candidateId = authenticationHelper.getUserId();
@@ -34,7 +37,7 @@ public class CandidateProfileController {
                 .build();
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfile(@RequestPart String profile,
                                            @RequestPart(required = false) MultipartFile avatar
@@ -52,6 +55,7 @@ public class CandidateProfileController {
     }
 
     //get all my CV
+    @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @GetMapping("/cv")
     public ResponseEntity<?> getCVs() {
         Long candidateId = authenticationHelper.getUserId();
@@ -61,6 +65,7 @@ public class CandidateProfileController {
                 .build();
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @PostMapping(value = "/cv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadCV(@RequestPart String cvName,
                                       @RequestParam("file") MultipartFile file) {
@@ -72,6 +77,7 @@ public class CandidateProfileController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @DeleteMapping("/cv/{cvId}")
     public ResponseEntity<?> deleteCV(@PathVariable Long cvId) {
         Long candidateId = authenticationHelper.getUserId();
@@ -82,7 +88,7 @@ public class CandidateProfileController {
         return ResponseEntity.ok(response);
     }
 
-
+    @PreAuthorize(SecurityEndpoint.RECRUITER)
     @GetMapping("/{candidateId}")
     public ResponseEntity<?> getCandidateDetail(@PathVariable Long candidateId) {
         CandidateDetailResponse response = candidateService.getCandidateDetail(candidateId);
@@ -93,7 +99,7 @@ public class CandidateProfileController {
 
         return ResponseEntity.ok(apiResponse);
     }
-
+    @PreAuthorize(SecurityEndpoint.RECRUITER)
     @GetMapping("/chat/{candidateId}")
     public ResponseEntity<?> getCandidateForChat(@PathVariable Long candidateId) {
         SimpleCandidateResponse response = candidateService.getCandidateForChat(candidateId);

@@ -1,6 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.service.impl.JobService;
@@ -8,12 +9,14 @@ import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX+"/job")
 @RequiredArgsConstructor
+@PreAuthorize(SecurityEndpoint.CANDIDATE)
 public class ApplyJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;

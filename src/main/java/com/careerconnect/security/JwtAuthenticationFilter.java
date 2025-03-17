@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
+            Logger.log("current user: " + userDetails);
             filterChain.doFilter(request, response);
         } catch (CustomJwtException e) {
             // ⚠️ Ghi trực tiếp phản hồi, không để Spring Security xử lý

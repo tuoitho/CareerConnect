@@ -6,6 +6,7 @@ import com.careerconnect.service.impl.ChatService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,13 +19,14 @@ public class ChatApiController {
     private final AuthenticationHelper authenticationHelper;
     private final ChatMessageRepo chatMessageRepo;
     private final ChatService chatService;
-
+    @PreAuthorize("hasRole('CANDIDATE')")
     @GetMapping("/recruiter-contacts")
     public ResponseEntity<?> getRecruiterContacts() {
         Long userId = authenticationHelper.getUserId();
         ApiResponse<?> response = ApiResponse.builder().result(chatService.getRecruitersForCandidate(userId)).build();
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasRole('RECRUITER')")
     @GetMapping("/candidate-contacts")
     public ResponseEntity<?> getUsersWithMessageHistory() {
         Long userId = authenticationHelper.getUserId();

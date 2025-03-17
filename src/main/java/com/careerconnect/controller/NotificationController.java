@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.NotificationResponse;
 import com.careerconnect.service.impl.NotificationService;
 import com.careerconnect.constant.ApiEndpoint;
@@ -7,11 +8,13 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX + "/notifications")
 @RequiredArgsConstructor
+@PreAuthorize(SecurityEndpoint.BOTH)
 public class NotificationController {
 
     private final NotificationService notificationService;

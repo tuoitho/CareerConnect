@@ -31,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,6 +64,7 @@ public class CompanyService {
         return companyMapper.toCompanyResponse(company);
     }
 
+    @Transactional
     public CompanyResponse registerCompany(Long userId, RegisterCompanyRequest registerCompanyRequest) {
         Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         if (recruiter.getCompany() != null) {
@@ -73,6 +75,8 @@ public class CompanyService {
         if (registerCompanyRequest.getLogo() != null)
             company.setLogo(imageService.uploadCloudinary(registerCompanyRequest.getLogo()));
         recruiter.setCompany(company);
+        recruiter.setRepresentative(true);
+        userRepository.save(recruiter);
         return companyMapper.toCompanyResponse(companyRepo.save(company));
     }
 
@@ -178,5 +182,28 @@ public class CompanyService {
     public CompanyResponse getCompanyById(Long id) {
         Company company = companyRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(Company.class, id));
         return companyMapper.toCompanyResponse(company);
+    }
+
+    public void removeMember(Long userId, long id) {
+        if (userId.equals(id)) {
+            throw new AppException(ErrorCode.NOT_PERMITTED);
+        }
+        Recruiter representative = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
+
+        if (!representative.isRepresentative()) {
+            throw new AppException(ErrorCode.NOT_PERMITTED);
+        }
+
+        Company company = representative.getCompany();
+        if (company == null) {
+            throw new AppException(ErrorCode.NOT_IN_COMPANY);
+        }
+        Recruiter member = (Recruiter) userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, id));
+        if (!member.getCompany().getCompanyId().equals(company.getCompanyId())) {
+            throw new AppException(ErrorCode.NOT_PERMITTED);
+        }
+        member.setCompany(null);
+
+        userRepository.save(member);
     }
 }

@@ -1,12 +1,14 @@
 package com.careerconnect.controller;
 
 
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.SavedJobResponseDTO;
 import com.careerconnect.service.impl.SavedJobService;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/saved-jobs")
 @RequiredArgsConstructor
+@PreAuthorize(SecurityEndpoint.CANDIDATE)
 public class SavedJobController {
     private final SavedJobService savedJobService;
     private final AuthenticationHelper authenticationHelper;

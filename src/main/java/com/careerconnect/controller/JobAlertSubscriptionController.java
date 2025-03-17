@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.service.impl.JobAlertSubscriptionService;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
@@ -7,10 +8,12 @@ import com.careerconnect.dto.request.JobAlertSubscriptionRequest;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX + "/job-alerts")
+@PreAuthorize(SecurityEndpoint.CANDIDATE)
 @RequiredArgsConstructor
 public class JobAlertSubscriptionController {
     private final JobAlertSubscriptionService jobAlertSubscriptionService;
