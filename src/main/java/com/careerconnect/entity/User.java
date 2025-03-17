@@ -18,6 +18,9 @@ public abstract class User {
     protected String password;
     protected Boolean active=true;
 
+    @Column(name = "coin_balance", nullable = false)
+    private Integer coinBalance = 0; // Số xu hiện tại, mặc định là 0
+
     @ManyToOne
     @JoinColumn
     protected Role role;
