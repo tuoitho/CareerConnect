@@ -8,6 +8,7 @@ import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class VNPayApiController {
 
     private final CoinRechargeService coinRechargeService;
     private final AuthenticationHelper authenticationHelper;
+    private final VNPayConfig vnPayConfig;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -46,7 +48,7 @@ public class VNPayApiController {
         String orderType = "order-type";
         String vnp_TxnRef = recharge.getId().toString();
         String vnp_IpAddr = request.getRemoteAddr();
-        String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
+        String vnp_TmnCode = vnPayConfig.vnp_TmnCode;
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
@@ -60,7 +62,7 @@ public class VNPayApiController {
         vnp_Params.put("vnp_Locale", "vn");
 
         String urlReturn = "";
-        urlReturn += VNPayConfig.vnp_ReturnUrl;
+        urlReturn += vnPayConfig.vnp_ReturnUrl;
 
         vnp_Params.put("vnp_ReturnUrl", urlReturn);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
@@ -98,11 +100,12 @@ public class VNPayApiController {
             }
         }
         String queryUrl = query.toString();
-        String salt = VNPayConfig.vnp_HashSecret;
+        String salt = vnPayConfig.vnp_HashSecret;
+        Logger.log(salt);
         String vnp_SecureHash = VNPayConfig.hmacSHA512(salt, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         Map<String, String> result = new HashMap<>();
-        result.put("paymentUrl", VNPayConfig.vnp_PayUrl + "?" + queryUrl);
+        result.put("paymentUrl", vnPayConfig.vnp_PayUrl + "?" + queryUrl);
         ApiResponse<Map<String, String>> response = ApiResponse.<Map<String, String>>builder()
                 .result(result)
                 .build();
@@ -129,7 +132,7 @@ public class VNPayApiController {
         fields.remove("vnp_SecureHash");
 
         // Tính checksum bằng hàm hashAllFields
-        String signValue = VNPayConfig.hashAllFields(fields);
+        String signValue = vnPayConfig.hashAllFields(fields);
         String vnp_TxnRef = fields.get("vnp_TxnRef");
 
         // Chuẩn bị URL chuyển hướng

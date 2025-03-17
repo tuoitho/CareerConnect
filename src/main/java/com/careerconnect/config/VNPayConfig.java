@@ -1,23 +1,25 @@
 package com.careerconnect.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Component
 public class VNPayConfig {
 
-
     @Value("${vnpay.pay-url}")
-    public static String vnp_PayUrl;
+    public String vnp_PayUrl;
     @Value("${vnpay.return-url}")
-    public static String vnp_ReturnUrl;
+    public String vnp_ReturnUrl;
     @Value("${vnpay.tmn-code}")
-    public static String vnp_TmnCode;
+    public String vnp_TmnCode;
     @Value("${vnpay.hash-secret}")
-    public static String vnp_HashSecret;
+    public String vnp_HashSecret;
+
 
 
     public static String hmacSHA512(String key, String data) throws Exception {
@@ -33,7 +35,7 @@ public class VNPayConfig {
     }
 
 
-    public static String hashAllFields(Map fields) throws Exception {
+    public String hashAllFields(Map fields) throws Exception {
         List fieldNames = new ArrayList(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
