@@ -1,6 +1,6 @@
 package com.careerconnect.controller;
 
-import com.careerconnect.atest.VNPayConfig;
+import com.careerconnect.config.VNPayConfig;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.entity.CoinRecharge;
 import com.careerconnect.service.impl.CoinRechargeService;

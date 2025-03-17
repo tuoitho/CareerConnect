@@ -1,4 +1,6 @@
-package com.careerconnect.atest;
+package com.careerconnect.config;
+
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -6,10 +8,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class VNPayConfig {
-    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8088/api/vnpay/payment-return";
-    public static String vnp_TmnCode = "KB5K1R3O";
-    public static String vnp_HashSecret = "DRL1UDET368OAIX1VCSU50HT02URDN2H";
+
+
+    @Value("${vnpay.pay-url}")
+    public static String vnp_PayUrl;
+    @Value("${vnpay.return-url}")
+    public static String vnp_ReturnUrl;
+    @Value("${vnpay.tmn-code}")
+    public static String vnp_TmnCode;
+    @Value("${vnpay.hash-secret}")
+    public static String vnp_HashSecret;
+
 
     public static String hmacSHA512(String key, String data) throws Exception {
         Mac hmac512 = Mac.getInstance("HmacSHA512");
