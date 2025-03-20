@@ -93,9 +93,9 @@ public class AuthController {
         return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
 
-    //logout
+    //logout, tạm thời để require = false vì đang deploy vercel
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken, HttpServletRequest req, HttpServletResponse response) {
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken",required = false) String refreshToken, HttpServletRequest req, HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
