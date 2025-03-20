@@ -24,7 +24,7 @@ public class TokenBlacklistService {
 
     public boolean isBlacklisted(String token) {
 //        return redisTemplate.hasKey(token);
-//        tamj thoi return false
+//        tạm thời
         return false;
     }
 

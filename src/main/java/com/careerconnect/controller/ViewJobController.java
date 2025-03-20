@@ -1,6 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.JobDetailResponse;
@@ -11,11 +12,13 @@ import com.careerconnect.util.AuthenticationHelper;
 import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ApiEndpoint.PREFIX+"/company/jobs")
+@PreAuthorize(SecurityEndpoint.CANDIDATE)
 public class ViewJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;

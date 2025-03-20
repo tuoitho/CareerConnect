@@ -1,6 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.config.VNPayConfig;
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.entity.CoinRecharge;
 import com.careerconnect.service.impl.CoinRechargeService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
@@ -33,6 +35,7 @@ public class VNPayApiController {
     private String frontendUrl;
     private String paymentResultPath="/payment-result";
 
+    @PreAuthorize(SecurityEndpoint.BOTH)
     @PostMapping("/create-payment")
     public ResponseEntity<ApiResponse<Map<String, String>>> createPayment(
             @RequestParam("coinAmount") Integer coinAmount,

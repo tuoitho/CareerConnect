@@ -1,6 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.service.ImageService;
@@ -8,11 +9,13 @@ import com.careerconnect.service.impl.CompanyService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ApiEndpoint.PREFIX+"/invitation")
+@PreAuthorize(SecurityEndpoint.RECRUITER)
 public class InvitationController {
     private final CompanyService companyService;
     private final AuthenticationHelper authenticationHelper;

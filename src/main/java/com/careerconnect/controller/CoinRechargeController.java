@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.CoinRechargeResponse;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/coin-recharges")
 @RequiredArgsConstructor
+@PreAuthorize(SecurityEndpoint.BOTH)
 public class CoinRechargeController {
     private final CoinRechargeService coinRechargeService;
     private final AuthenticationHelper authenticationHelper;
