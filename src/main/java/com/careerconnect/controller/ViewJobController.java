@@ -9,6 +9,7 @@ import com.careerconnect.dto.response.JobResponse;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.service.impl.SearchJobService;
 import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
 import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ApiEndpoint.PREFIX+"/company/jobs")
-@PreAuthorize(SecurityEndpoint.CANDIDATE)
+
 public class ViewJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;
@@ -46,7 +47,7 @@ public class ViewJobController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchJobs(@RequestParam String query, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
+    public ResponseEntity<?> searchJobs(@RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
         var jobs = jobService.searchJobs(query, page, size);
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Jobs retrieved successfully")
@@ -55,7 +56,7 @@ public class ViewJobController {
         return ResponseEntity.ok(response);
     }
 
-
+    @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @PostMapping("/{jobId}/view-applicants")
     public ResponseEntity<?> viewApplicants(@PathVariable Long jobId) {
         Long userId = authenticationHelper.getUserId();
