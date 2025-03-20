@@ -65,7 +65,7 @@ public class AuthController {
         cookie.setMaxAge(365 * 24 * 60 * 60);
         cookie.setHttpOnly(true); // Prevent client-side JavaScript from accessing the cookie
         cookie.setSecure(true); // Set to true if using HTTPS
-        cookie.setAttribute("SameSite", "Lax"); // Allow the cookie to be sent with same-site requests
+        cookie.setAttribute("SameSite", "None"); // Allow the cookie to be sent with same-site requests
         response.addCookie(cookie);
 
         return ResponseEntity.ok().body(loginResponse);
