@@ -103,7 +103,8 @@ public class AuthController {
 
         String accessToken = tokenProvider.getJwtFromRequest(req);
         tokenBlacklistService.addAccessTokenToBlacklist(accessToken);
-        tokenBlacklistService.addRefreshTokenToBlacklist(refreshToken);
+//        tạm thời comment vì đang deploy vercel nó k cho set cookie ở bước login, còn local thì ok
+//        tokenBlacklistService.addRefreshTokenToBlacklist(refreshToken);
 
         ApiResponse<String> apiResponse=ApiResponse.<String>builder().message("Logout successfully").build();
         return ResponseEntity.ok().body(apiResponse);
