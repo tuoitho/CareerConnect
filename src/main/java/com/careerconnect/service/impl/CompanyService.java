@@ -93,7 +93,7 @@ public class CompanyService {
         Logger.log(registerCompanyRequest);
         return companyMapper.toCompanyResponse(companyRepo.save(company));
     }
-
+    @Transactional
     public void addMember(Long userId, AddMemberRequest addMemberRequest) {
         Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         Company company = recruiter.getCompany();
@@ -120,7 +120,7 @@ public class CompanyService {
                 .build();
         mailService.send(mailDTO);
     }
-
+    @Transactional
     public InvitationResponse accept(Long userId, String token) {
         Invitation invitation = invitationRepository.findByToken(token).orElseThrow(() -> new ResourceNotFoundException(RoleService.class, "token", token));
         if (!Objects.equals(userId, invitation.getInviter().getUserId())) {

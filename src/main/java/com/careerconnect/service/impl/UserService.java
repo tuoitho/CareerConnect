@@ -10,6 +10,7 @@ import com.careerconnect.mapper.UserMapper;
 import com.careerconnect.repository.RoleRepository;
 import com.careerconnect.repository.UserRepository;
 import com.careerconnect.security.JwtTokenProvider;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.security.core.Authentication;
@@ -28,7 +29,6 @@ public class UserService {
     public String generateAccessToken(Authentication authentication) {
         return tokenProvider.generateAccessToken(authentication);
     }
-
     public void registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new RuntimeException("Username is already taken!");

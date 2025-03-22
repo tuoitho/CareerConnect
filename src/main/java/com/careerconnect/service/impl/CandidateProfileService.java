@@ -178,7 +178,7 @@ public class CandidateProfileService {
                         .collect(Collectors.toSet()))
                 .build();
     }
-
+    @Transactional
     public CandidateProfileResponse.CVResponse uploadCV(Long candidateId, String cvName, MultipartFile file) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
                 .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
@@ -201,7 +201,7 @@ public class CandidateProfileService {
                 .active(savedCV.getActive())
                 .build();
     }
-
+    @Transactional
     public CandidateProfileResponse.CVResponse deleteCV(Long candidateId, Long cvId) {
         Candidate candidate = candidateRepository.findByIdWithRelations(candidateId)
                 .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, candidateId));
