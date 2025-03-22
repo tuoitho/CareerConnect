@@ -1,27 +1,25 @@
 // src/main/java/com/careerconnect/controller/AdminController.java
-package com.careerconnect.atest.admin;
+package com.careerconnect.controller;
 
-import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
+import com.careerconnect.dto.response.AdminJobResponse;
+import com.careerconnect.service.impl.AdminService;
+import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.*;
-import com.careerconnect.repository.CoinRechargeRepository;
 import com.careerconnect.service.impl.*;
-import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX + "/admin")
 @RequiredArgsConstructor
+@PreAuthorize(SecurityEndpoint.ADMIN)
 public class AdminController {
 
     private final UserService userService;

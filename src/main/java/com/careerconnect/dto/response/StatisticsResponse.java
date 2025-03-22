@@ -1,4 +1,4 @@
-package com.careerconnect.atest.admin;
+package com.careerconnect.dto.response;
 
 import lombok.Data;
 

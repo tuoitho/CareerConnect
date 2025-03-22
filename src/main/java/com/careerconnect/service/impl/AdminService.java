@@ -1,5 +1,5 @@
 // src/main/java/com/careerconnect/service/impl/AdminService.java
-package com.careerconnect.atest.admin;
+package com.careerconnect.service.impl;
 
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.*;
@@ -10,7 +10,6 @@ import com.careerconnect.enums.RoleEnum;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.*;
 import com.careerconnect.service.PaginationService;
-import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 

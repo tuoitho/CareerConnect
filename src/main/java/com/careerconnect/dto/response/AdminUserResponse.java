@@ -1,5 +1,5 @@
 // src/main/java/com/careerconnect/dto/response/AdminUserResponse.java
-package com.careerconnect.atest.admin;
+package com.careerconnect.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
