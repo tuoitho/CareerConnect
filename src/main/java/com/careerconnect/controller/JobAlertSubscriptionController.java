@@ -6,6 +6,7 @@ import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.JobAlertSubscriptionRequest;
 import com.careerconnect.util.AuthenticationHelper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,7 @@ public class JobAlertSubscriptionController {
     private final AuthenticationHelper authenticationHelper;
 
     @PostMapping("/subscribe")
-    public ResponseEntity<?> subscribe(@RequestBody JobAlertSubscriptionRequest request) {
+    public ResponseEntity<?> subscribe(@Valid @RequestBody JobAlertSubscriptionRequest request) {
         Long candidateId = authenticationHelper.getUserId();
         jobAlertSubscriptionService.subscribe(candidateId, request);
         ApiResponse<?> response = ApiResponse.builder()

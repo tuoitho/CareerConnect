@@ -6,6 +6,7 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class ManageJobController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createJob(@RequestBody CreateJobRequest job) {
+    public ResponseEntity<?> createJob(@Valid @RequestBody CreateJobRequest job) {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Job created successfully")
                 .result(jobService.createJob(authenticationHelper.getUserId(),job))
@@ -50,7 +51,7 @@ public class ManageJobController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody CreateJobRequest job) {
+    public ResponseEntity<?> updateJob(@PathVariable Long id, @Valid @RequestBody CreateJobRequest job) {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Job updated successfully")
                 .result(jobService.updateJob(authenticationHelper.getUserId(), id, job))
