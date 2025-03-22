@@ -8,6 +8,7 @@ import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.*;
 import com.careerconnect.repository.CoinRechargeRepository;
 import com.careerconnect.service.impl.*;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX + "/admin")
@@ -166,16 +169,20 @@ public class AdminController {
                 .build());
     }
 
-    // Thống kê
-    @GetMapping("/stats")
-    public ResponseEntity<ApiResponse<AdminStatsResponse>> getStatistics(
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
-        AdminStatsResponse stats = adminService.getStatistics(startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.<AdminStatsResponse>builder()
+
+    // Dashboard APIs
+    @GetMapping("/dashboard/stats")
+    public ResponseEntity<ApiResponse<StatisticsResponse>> getDashboardStats(
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate,
+            @RequestParam(defaultValue = "day") String groupBy) {
+
+        StatisticsResponse stats = adminService.getStatistics(fromDate, toDate, groupBy);
+        return ResponseEntity.ok(ApiResponse.<StatisticsResponse>builder()
                 .result(stats)
-                .message("Statistics retrieved successfully")
+                .message("Dashboard statistics retrieved successfully")
                 .build());
     }
+
 
 }
