@@ -136,6 +136,13 @@ public class AdminService {
         job.setActive(false);
         jobRepository.save(job);
     }
+    @Transactional
+    public void showJob(Long jobId) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException(Job.class, jobId));
+        job.setActive(true);
+        jobRepository.save(job);
+    }
 
     // Thống kê
     public AdminStatsResponse getStatistics(String startDate, String endDate) {

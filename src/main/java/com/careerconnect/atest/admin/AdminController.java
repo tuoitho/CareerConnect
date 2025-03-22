@@ -129,6 +129,13 @@ public class AdminController {
                 .message("Job hidden successfully")
                 .build());
     }
+    @PutMapping("/jobs/{jobId}/show")
+    public ResponseEntity<ApiResponse<String>> showJob(@PathVariable Long jobId) {
+        adminService.showJob(jobId);
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .message("Job shown successfully")
+                .build());
+    }
 
     // Quản lý giao dịch
     @GetMapping("/transactions")
