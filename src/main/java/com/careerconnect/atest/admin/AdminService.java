@@ -10,13 +10,17 @@ import com.careerconnect.enums.RoleEnum;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.*;
 import com.careerconnect.service.PaginationService;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -145,26 +149,48 @@ public class AdminService {
     }
 
     // Thống kê
-    public AdminStatsResponse getStatistics(String startDate, String endDate) {
-        LocalDateTime start = startDate != null ? LocalDateTime.parse(startDate) : LocalDateTime.now().minusMonths(1);
-        LocalDateTime end = endDate != null ? LocalDateTime.parse(endDate) : LocalDateTime.now();
+    // Statistics
+    public StatisticsResponse getStatistics(String fromDate, String toDate, String groupBy) {
+        LocalDate from = fromDate != null && !fromDate.isEmpty() ? LocalDate.parse(fromDate) : LocalDate.now().minusMonths(1);
+        LocalDate to = toDate != null && !toDate.isEmpty() ? LocalDate.parse(toDate) : LocalDate.now();
+        StatisticsResponse response = new StatisticsResponse();
+        response.setTotalUsers(userRepository.count());
+        response.setActiveUsers(userRepository.countByLockedFalse());
+        response.setCandidateCount(userRepository.countByRole_RoleName(RoleEnum.CANDIDATE));
+        response.setRecruiterCount(userRepository.countByRole_RoleName(RoleEnum.RECRUITER));
+        response.setTotalCompanies(companyRepo.count());
+        response.setVerifiedCompanies(companyRepo.countByApprovedTrue());
+        response.setTotalJobs(jobRepository.count());
+        response.setTotalTransactions(coinRechargeRepository.count());
+        response.setTotalRevenue(coinRechargeRepository.sumAmountPaidByStatusAndDateRange("SUCCESS",
+                from.atStartOfDay(), to.plusDays(1).atStartOfDay()));
 
-        long totalUsers = userRepository.count();
-        long activeUsers = userRepository.countByLockedFalse();
-        long candidates = userRepository.countByRole_RoleName(RoleEnum.CANDIDATE);
-        long recruiters = userRepository.countByRole_RoleName(RoleEnum.RECRUITER);
-        long totalCompanies = companyRepo.count();
-        long totalJobs = jobRepository.count();
-        double totalRevenue = coinRechargeRepository.sumAmountPaidByStatusAndDateRange("SUCCESS", start, end);
+        Map<String, Integer> userRegistrationTrend = new HashMap<>();
+        Map<String, Integer> jobPostingTrend = new HashMap<>();
+        Map<String, Double> revenueTrend = new HashMap<>();
 
-        return AdminStatsResponse.builder()
-                .totalUsers(totalUsers)
-                .activeUsers(activeUsers)
-                .candidates(candidates)
-                .recruiters(recruiters)
-                .totalCompanies(totalCompanies)
-                .totalJobs(totalJobs)
-                .totalRevenue(totalRevenue)
-                .build();
+        switch (groupBy.toLowerCase()) {
+            case "month":
+                userRegistrationTrend = userRepository.countUserRegistrationsByMonth(from, to);
+                jobPostingTrend = jobRepository.countJobPostingsByMonth(from, to);
+                revenueTrend = coinRechargeRepository.sumRevenueByMonth(from, to);
+                break;
+            case "week":
+                userRegistrationTrend = userRepository.countUserRegistrationsByWeek(from, to);
+                jobPostingTrend = jobRepository.countJobPostingsByWeek(from, to);
+                revenueTrend = coinRechargeRepository.sumRevenueByWeek(from, to);
+                break;
+            case "day":
+            default:
+                userRegistrationTrend = userRepository.countUserRegistrationsByDay(from, to);
+                jobPostingTrend = jobRepository.countJobPostingsByDay(from, to);
+                revenueTrend = coinRechargeRepository.sumRevenueByDay(from, to);
+                break;
+        }
+
+        response.setUserRegistrationTrend(userRegistrationTrend);
+        response.setJobPostingTrend(jobPostingTrend);
+        response.setRevenueTrend(revenueTrend);
+        return response;
     }
 }

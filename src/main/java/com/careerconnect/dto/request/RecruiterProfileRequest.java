@@ -22,8 +22,6 @@ public class RecruiterProfileRequest {
     @Size(min = 2, max = 100, message = "Họ tên phải từ 2 đến 100 ký tự")
     private String fullname;
     @NotBlank(message = "Thông tin liên hệ không được để trống")
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$",
-            message = "Số điện thoại phải đúng định dạng (ví dụ: +84123456789 hoặc 0123456789)")
     private String contact;
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email phải đúng định dạng")
