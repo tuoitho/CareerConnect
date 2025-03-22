@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -65,6 +66,17 @@ public class HandleException {
                 .message(errorMessage)
                 .build();
         return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    ResponseEntity<ApiResponse<?>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+//        chỉ lấy message đầu tiên
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(25252)
+                .message(errorMessage)
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
     }
 
 }

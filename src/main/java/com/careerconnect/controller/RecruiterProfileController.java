@@ -6,10 +6,12 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.RecruiterProfileRequest;
 import com.careerconnect.service.impl.RecruiterProfileService;
 import com.careerconnect.util.AuthenticationHelper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping(ApiEndpoint.PREFIX+"/recruiter/profile")
@@ -28,7 +30,7 @@ public class RecruiterProfileController {
         return ResponseEntity.ok(response);
     }
     @PutMapping()
-    public ResponseEntity<?> updateProfile(@RequestBody  RecruiterProfileRequest req) {
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody  RecruiterProfileRequest req) {
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Company updated successfully")
                 .result(recruiterProfileService.updateProfile(authenticationHelper.getUserId(), req))

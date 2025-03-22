@@ -14,9 +14,9 @@ import java.util.List;
 @Setter
 //@Builder
 public class Recruiter extends User{
-    private String fullname;
+//    private String fullname;
     private String contact;
-    private String email;
+//    private String email;
     private boolean isRepresentative; // Có phải người đại diện không
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -7,6 +7,7 @@ import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.service.ImageService;
 import com.careerconnect.service.impl.CompanyService;
 import com.careerconnect.util.AuthenticationHelper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +33,7 @@ public class InvitationController {
     }
 
     @PostMapping("/invite")
-    public ResponseEntity<?> inviteMember(@RequestBody AddMemberRequest addMemberRequest) {
+    public ResponseEntity<?> inviteMember(@Valid @RequestBody AddMemberRequest addMemberRequest) {
         companyService.addMember(authenticationHelper.getUserId(),addMemberRequest);
         ApiResponse<?> response = ApiResponse.builder()
                 .message("Mời thành viên thành công")

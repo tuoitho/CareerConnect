@@ -91,4 +91,18 @@ public class CoinRechargeService {
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, userId));
         return user.getCoinBalance();
     }
+
+    public PaginatedResponse<CoinRechargeResponse> getAllRechargeHistory(Pageable pageable){
+        return paginationService.paginate(coinRechargeRepository.findAll(pageable),x-> CoinRechargeResponse.builder()
+                .id(x.getId())
+                .coinAmount(x.getCoinAmount())
+                .amountPaid(x.getAmountPaid())
+                .paymentMethod(x.getPaymentMethod())
+                .transactionCode(x.getTransactionCode())
+                .status(x.getStatus())
+                .createdAt(x.getCreatedAt())
+                .updatedAt(x.getUpdatedAt())
+                .build());
+
+    }
 }

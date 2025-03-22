@@ -73,6 +73,7 @@ public class JobService {
 
     }
     //create
+    @Transactional
     public CreateJobResponse createJob(Long userId, CreateJobRequest req) {
         //get company from recruiter
         Recruiter recruiter = (Recruiter) userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
@@ -159,7 +160,7 @@ public class JobService {
         response.setApplications(applicationWithCandidates);
         return response;
     }
-
+    @Transactional
     public CreateJobResponse updateJob(Long userId, Long id, CreateJobRequest job) {
         Job jobToUpdate = jobRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Job.class, id));
         //get company from recruiter
@@ -198,7 +199,7 @@ public class JobService {
                 .active(updatedJob.isActive())
                 .build();
     }
-
+    @Transactional
     public void deleteJob(Long userId, Long id) {
         Job job = jobRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Job.class, id));
         //get company from recruiter
@@ -298,7 +299,7 @@ public class JobService {
                 .companyLogo(job.getCompany().getLogo())
                 .build());
     }
-
+    @Transactional
     public Long viewApplicants(Long userId, Long jobId) {
 //        check balace
         User user=userRepository.findById(userId).get();

@@ -6,6 +6,7 @@ import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class ApplyJobController {
     private final AuthenticationHelper authenticationHelper;
 
     @PostMapping("/apply")
-    public ResponseEntity<?> applyJob(@RequestBody ApplyJobRequest request) {
+    public ResponseEntity<?> applyJob(@Valid @RequestBody ApplyJobRequest request) {
         // Logic xử lý apply job
         Long candidateId = authenticationHelper.getUserId();
         jobService.applyJob(candidateId, request);
