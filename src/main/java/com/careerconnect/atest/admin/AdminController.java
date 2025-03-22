@@ -93,6 +93,13 @@ public class AdminController {
                 .message("Company locked successfully")
                 .build());
     }
+    @PutMapping("/companies/{companyId}/unlock")
+    public ResponseEntity<ApiResponse<String>> unlockCompany(@PathVariable Long companyId) {
+        adminService.unlockCompany(companyId);
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .message("Company unlocked successfully")
+                .build());
+    }
 
     // Quản lý tin tuyển dụng
     @GetMapping("/jobs")

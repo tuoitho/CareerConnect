@@ -100,6 +100,13 @@ public class AdminService {
         company.setActive(false);
         companyRepo.save(company);
     }
+    @Transactional
+    public void unlockCompany(Long companyId) {
+        Company company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new ResourceNotFoundException(Company.class, companyId));
+        company.setActive(true);
+        companyRepo.save(company);
+    }
 
     // Quản lý tin tuyển dụng
     public PaginatedResponse<AdminJobResponse> getAllJobs(Pageable pageable) {
