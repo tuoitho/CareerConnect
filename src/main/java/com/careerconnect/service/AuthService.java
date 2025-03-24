@@ -5,10 +5,11 @@ import com.careerconnect.dto.response.LoginResponse;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.security.CustomUserDetails;
-import com.careerconnect.security.JwtTokenProvider;
+import com.careerconnect.security.JwtService;
 import com.careerconnect.service.impl.UserService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.CookieUtil;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -32,9 +34,7 @@ public class AuthService {
     private final WebClient webClient;
 
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider tokenProvider;
-    private final UserService userService;
-    private final AuthenticationHelper authenticationHelper;
+    private final JwtService tokenProvider;
 
     public LoginResponse login(LoginRequest loginRequest, String captchaToken) {
         Boolean isCaptchaValid = verifyCaptcha(captchaToken).block();
@@ -47,9 +47,39 @@ public class AuthService {
                         loginRequest.getPassword()
                 )
         );
-        String accessToken = tokenProvider.generateAccessToken(authentication);
 
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String accessToken = tokenProvider.generateAccessToken(userDetails);
+
+
+        LoginResponse.LoggedInUser loggedInUser = LoginResponse.LoggedInUser.builder()
+                .userId(userDetails.getUserId())
+                .username(userDetails.getUsername())
+                .role(userDetails.getRole())
+                .build();
+
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .user(loggedInUser)
+                .build();
+    }
+    public LoginResponse login(LoginRequest loginRequest) {
+        Authentication authentication=null;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        Logger.log("Authentication: " + authentication.getPrincipal());
+        Logger.log("Authentication: " + authentication.getDetails());
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        String accessToken = tokenProvider.generateAccessToken(user);
 
         LoginResponse.LoggedInUser loggedInUser = LoginResponse.LoggedInUser.builder()
                 .userId(user.getUserId())
@@ -70,7 +100,9 @@ public class AuthService {
                         loginRequest.getPassword()
                 )
         );
-        return tokenProvider.generateRefreshToken(authentication);
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return tokenProvider.generateRefreshToken(userDetails);
 
     }
     private Mono<Boolean> verifyCaptcha(String token) {

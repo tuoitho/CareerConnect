@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 
@@ -21,27 +23,20 @@ public class AuthenticationHelper {
     private final UserRepository userRepository;
     public Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null) {
-//            switch (authentication) {
-//                case UsernamePasswordAuthenticationToken authenticationToken -> {
-//                    CustomUserDetails customUserDetails=(CustomUserDetails)authentication.getPrincipal();
-//                    return customUserDetails.getUserId();
-//                }
-//                default -> {
-//                    // Xử lý trường hợp không xác định
-//                    return null;
-//                }
-//            }
-//        }
         if (authentication != null) {
+            if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+                Object principal = jwtAuthenticationToken.getPrincipal();
+                if (principal instanceof Jwt jwt){
+                    return Long.parseLong(jwt.getClaims().get("userId").toString());
+                }
+            } else
             if (authentication instanceof UsernamePasswordAuthenticationToken) {
                 Object principal = authentication.getPrincipal();
-                if (principal instanceof CustomUserDetails) {
-                    CustomUserDetails customUserDetails = (CustomUserDetails) principal;
+                if (principal instanceof CustomUserDetails customUserDetails) {
                     return customUserDetails.getUserId();
                 }
             } else if (authentication instanceof OAuth2AuthenticationToken) {
-//                OAuth2User oauth2User = ((OAuth2AuthenticationToken) authentication).getPrincipal();
+                OAuth2User oauth2User = ((OAuth2AuthenticationToken) authentication).getPrincipal();
 //                // Extract user ID from OAuth2User if available
 //                String email = oauth2User.getAttribute("email");
 //                if (email != null) {

@@ -8,7 +8,8 @@ import com.careerconnect.dto.response.LoginResponse;
 import com.careerconnect.dto.response.TokenResponse;
 import com.careerconnect.entity.User;
 import com.careerconnect.security.CustomUserDetails;
-import com.careerconnect.security.JwtTokenProvider;
+import com.careerconnect.security.CustomUserDetailsService;
+import com.careerconnect.security.JwtService;
 import com.careerconnect.security.TokenBlacklistService;
 import com.careerconnect.service.AuthService;
 import com.careerconnect.service.impl.UserService;
@@ -46,19 +47,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping(ApiEndpoint.PREFIX+"/auth")
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider tokenProvider;
+    private final JwtService tokenProvider;
     private final CookieUtil cookieUtil;
     private final UserService userService;
-    private final AuthenticationHelper authenticationHelper;
     private final AuthService authService;
-    private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestParam(value = "tk") String token, HttpServletResponse response) {
         LoginResponse loginResponse = authService.login(loginRequest,token);
-
         String refreshToken = authService.generateRefreshToken(loginRequest);
 
         Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -86,12 +84,14 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(
 //            @RequestParam String refreshToken,
             @CookieValue("refreshToken") String refreshToken) {
-        String username = tokenProvider.getUsernameFromToken(refreshToken);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        String newAccessToken = tokenProvider.generateAccessToken(authentication);
-        return ResponseEntity.ok(new TokenResponse(newAccessToken));
+        String username = tokenProvider.extractUsername(refreshToken);
+        CustomUserDetails userDetails = (CustomUserDetails)customUserDetailsService.loadUserByUsername(username);
+        if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
+            String newAccessToken = tokenProvider.generateAccessToken(userDetails);
+            return ResponseEntity.ok(new TokenResponse(newAccessToken));
+        } else {
+            throw new RuntimeException("Refresh token is invalid");
+        }
     }
 
     //logout, tạm thời để require = false vì đang deploy vercel

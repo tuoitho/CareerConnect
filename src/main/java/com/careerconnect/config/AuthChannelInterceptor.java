@@ -2,7 +2,7 @@ package com.careerconnect.config;
 
 import com.careerconnect.security.CustomUserDetails;
 import com.careerconnect.security.CustomUserDetailsService;
-import com.careerconnect.security.JwtTokenProvider;
+import com.careerconnect.security.JwtService;
 import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -24,7 +24,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class AuthChannelInterceptor implements ChannelInterceptor {
-    private final JwtTokenProvider tokenProvider;
+    private final JwtService tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
@@ -97,21 +97,23 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            String token;
+            Logger.log("user connected with token: " + accessor.getNativeHeader("Authorization"));
             Object raw = message.getHeaders().get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
             String tk2 = (String) ((ArrayList) ((Map) raw).get("Authorization")).get(0);
             try {
                 if (StringUtils.hasText(tk2) && tk2.startsWith("Bearer ")) {
-                    token=tk2;
-                    token = token.substring(7);
-                    if (tokenProvider.validateToken(token)) {
-                        String username = tokenProvider.getUsernameFromToken(token);
-                        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-                        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+                    tk2 = tk2.substring(7);
+                    //lúc này trong security context chưa có user
+                    CustomUserDetails customUserDetails= (CustomUserDetails) customUserDetailsService.loadUserByUsername(tokenProvider.extractUsername(tk2));
+                    if (tokenProvider.isTokenValid(tk2, customUserDetails)) {
+                        String username = tokenProvider.extractUsername(tk2);
+                        Logger.log("user login", username);
                         // Tạo Principal từ UserDetails
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        );
+//                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+//                                userDetails, null, userDetails.getAuthorities()
+//                        );
+                        Logger.log("customUserDetails login", customUserDetails);
+
                         // Đặt Principal trực tiếp vào accessor
                         accessor.setUser(() -> customUserDetails.getUserId().toString());
                     } else {

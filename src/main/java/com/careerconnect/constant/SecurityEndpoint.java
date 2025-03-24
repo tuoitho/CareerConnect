@@ -2,6 +2,8 @@ package com.careerconnect.constant;
 
 public class SecurityEndpoint {
     public static final String[] AUTH_WHITELIST = {
+
+            "/api/tttt",
             "/api-docs/**",
             "/favicon.ico",
             "/v3/api-docs/**",

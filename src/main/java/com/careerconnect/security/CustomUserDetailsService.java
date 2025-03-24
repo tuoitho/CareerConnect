@@ -2,6 +2,7 @@ package com.careerconnect.security;
 
 import com.careerconnect.entity.User;
 import com.careerconnect.repository.UserRepository;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Logger.log("LoaduserByUsername: " + username);
         Optional<User> user = userRepository.findByUsername(username);
         return user.map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("UserName not found: " + username));

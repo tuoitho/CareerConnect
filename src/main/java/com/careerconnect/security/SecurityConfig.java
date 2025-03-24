@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,8 +20,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -38,8 +43,11 @@ import static com.careerconnect.constant.SecurityEndpoint.AUTH_WHITELIST;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+//    private final CustomAuthenticationFailureHandler failureHandler;
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+//    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -69,51 +77,59 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(x -> x.configurationSource(corsConfigurationSource()))
 
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))  // Sử dụng JwtAuthenticationEntryPoint để xử lý các yêu cầu không hợp lệ
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .anyRequest().authenticated()
-                )
+    private final JwtAuthConverter jwtAuthConverter;
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomJwtDecoder jwtDecoder) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF cho REST API
+                .cors(x -> x.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AUTH_WHITELIST).permitAll() // Công khai các endpoint này
+                        .anyRequest().authenticated() // Các request khác cần token
+                )
+
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(jwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthConverter)
+                        )
+//                        .authenticationEntryPoint(failureHandler::onAuthenticationFailure) // Gắn failure handler)
+                                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+
                 );
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .cors(x -> x.configurationSource(corsConfigurationSource()))
+//
+//                .exceptionHandling(exceptionHandling -> exceptionHandling
+//                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))  // Sử dụng JwtAuthenticationEntryPoint để xử lý các yêu cầu không hợp lệ
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(AUTH_WHITELIST).permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                );
+//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+//        return http.build();
+//    }
+
 
     // can thiet neu xac thuc bang username va password
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
-
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    @Component
-    @RequiredArgsConstructor
-    public static class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-        private final ObjectMapper objectMapper; // Inject để serialize JSON
-
-        @Override
-        public void commence(HttpServletRequest request, HttpServletResponse response,
-                             AuthenticationException authException) throws IOException {
-            ApiResponse<?> apiResponse = ApiResponse.builder()
-                    .message("Unauthorized: " + authException.getMessage())
-                    .build();
-            response.setContentType("application/json");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
-        }
-    }
+//    @Bean
+//    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setUserDetailsService(userDetailsService);
+//        provider.setPasswordEncoder(passwordEncoder);
+//        return provider;
+//    }
 
 }

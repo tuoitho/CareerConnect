@@ -7,6 +7,7 @@ import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.NotificationRepository;
 import com.careerconnect.service.PaginationService;
 import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ public class NotificationService {
     // Lấy danh sách thông báo phân trang
     public PaginatedResponse<NotificationResponse> getNotifications(int page, int size) {
         Long userId = authenticationHelper.getUserId();
+        Logger.log("getNotifications userId = " + userId);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Notification> notifications = notificationRepository.findByUser_UserIdOrderByCreatedAtDesc(userId, pageable);
 

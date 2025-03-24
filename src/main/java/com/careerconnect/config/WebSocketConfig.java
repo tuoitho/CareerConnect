@@ -1,7 +1,7 @@
 package com.careerconnect.config;
 
 import com.careerconnect.security.CustomUserDetailsService;
-import com.careerconnect.security.JwtTokenProvider;
+import com.careerconnect.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -14,7 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final JwtTokenProvider tokenProvider;
+    private final JwtService tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
     @Override 
     public void registerStompEndpoints(StompEndpointRegistry registry) {

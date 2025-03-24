@@ -12,7 +12,7 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
-                .baseUrl(baseUrl) // URL cơ sở cho Cloudflare Turnstile
+                .baseUrl(baseUrl)
                 .build();
     }
 }
