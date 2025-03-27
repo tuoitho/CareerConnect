@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -31,6 +32,152 @@ public class JwtService {
     private long jwtRefreshExpirationInMs;
 
     private final TokenBlacklistService tokenBlacklistService;
+
+    private String generateToken(String subject, long expirationInMs, Map<String, Object> extraClaims, List<String> roles) {
+        try {
+            JWSSigner signer = new MACSigner(secretKey);
+            JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
+                    .subject(subject)
+                    .issueTime(new Date())
+                    .expirationTime(new Date(System.currentTimeMillis() + expirationInMs));
+            if (roles != null && !roles.isEmpty()) {
+                claimsBuilder.claim("roles", roles);
+            }
+            extraClaims.forEach(claimsBuilder::claim);
+            SignedJWT signedJWT = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.HS256).build(),
+                    claimsBuilder.build()
+            );
+            signedJWT.sign(signer);
+            return signedJWT.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Error generating token", e);
+        }
+    }
+    // Hàm mới: Refresh token và tạo accessToken mới
+    public String refreshAccessToken(String refreshToken) {
+        try {
+            // Giải mã refreshToken
+            SignedJWT signedJWT = SignedJWT.parse(refreshToken);
+            JWSVerifier verifier = new MACVerifier(secretKey);
+
+            // Kiểm tra chữ ký
+            if (!signedJWT.verify(verifier)) {
+                throw new CustomJwtException("Invalid refresh token signature");
+            }
+
+            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+            String subject = claimsSet.getSubject(); // Email hoặc username
+            Date expiration = claimsSet.getExpirationTime();
+            Date now = new Date();
+
+            // Kiểm tra hết hạn
+            if (expiration == null || expiration.before(now)) {
+                throw new CustomJwtException("Refresh token has expired");
+            }
+
+            // Kiểm tra blacklist
+            if (tokenBlacklistService.isBlacklisted(refreshToken)) {
+                throw new CustomJwtException("Refresh token has been blacklisted");
+            }
+
+            // Lấy userId nếu có
+            String userId = claimsSet.getClaims().get("userId").toString();
+
+            // Tạo accessToken mới
+            Map<String, Object> extraClaims = userId != null ? Map.of("userId", userId) : Map.of();
+            //lấy roles từ refreshToken cũ
+//            List<String> roles = claimsSet.getStringListClaim("roles");
+            List<String> roles =claimsSet.getClaims().get("roles")!=null?(List<String>) claimsSet.getClaims().get("roles"):null;
+
+            return generateToken(subject, jwtExpirationInMs, extraClaims, roles);
+
+        } catch (ParseException | JOSEException e) {
+            e.printStackTrace();
+            throw new CustomJwtException("Error processing refresh token: " + e.getMessage());
+        }
+    }
+
+    public String generateAccessToken(OAuth2User oAuth2User) {
+        return generateAccessToken(Map.of(), oAuth2User);
+    }
+
+    public String generateAccessToken(Map<String, Object> extraClaims, OAuth2User oAuth2User) {
+        try {
+            JWSSigner signer = new MACSigner(secretKey);
+
+            String email = oAuth2User.getAttribute("email"); // Lấy email làm subject
+            List<String> roles = oAuth2User.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role)
+                    .collect(Collectors.toList());
+
+            JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
+                    .subject(email)
+                    .issueTime(new Date())
+                    .expirationTime(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                    .claim("roles", roles);
+
+            // Nếu CustomOAuth2User có userId, thêm vào claims
+            if (oAuth2User instanceof CustomOAuth2User customOAuth2User) {
+                claimsBuilder.claim("userId", customOAuth2User.getUserId());
+            }
+
+            extraClaims.forEach(claimsBuilder::claim);
+
+            SignedJWT signedJWT = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.HS256).build(),
+                    claimsBuilder.build()
+            );
+            signedJWT.sign(signer);
+
+            return signedJWT.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Error generating OAuth2 access token", e);
+        }
+    }
+
+    // Hàm tạo refreshToken từ OAuth2User
+    public String generateRefreshToken(OAuth2User oAuth2User) {
+        return generateRefreshToken(Map.of(), oAuth2User);
+    }
+
+    public String generateRefreshToken(Map<String, Object> extraClaims, OAuth2User oAuth2User) {
+        try {
+            JWSSigner signer = new MACSigner(secretKey);
+
+            String email = oAuth2User.getAttribute("email"); // Lấy email làm subject
+
+            JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
+                    .subject(email)
+                    .issueTime(new Date())
+                    .expirationTime(new Date(System.currentTimeMillis() + jwtRefreshExpirationInMs));
+
+            // Nếu CustomOAuth2User có userId, thêm vào claims
+            if (oAuth2User instanceof CustomOAuth2User customOAuth2User) {
+                claimsBuilder.claim("userId", customOAuth2User.getUserId());
+            }
+
+            //role
+            List<String> roles = oAuth2User.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role)
+                    .toList();
+            claimsBuilder.claim("roles", roles);
+
+            extraClaims.forEach(claimsBuilder::claim);
+
+            SignedJWT signedJWT = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.HS256).build(),
+                    claimsBuilder.build()
+            );
+            signedJWT.sign(signer);
+
+            return signedJWT.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Error generating OAuth2 refresh token", e);
+        }
+    }
 
     public String generateAccessToken(CustomUserDetails userDetails) {
         return generateAccessToken(Map.of(), userDetails);
@@ -90,6 +237,13 @@ public class JwtService {
 
             // Add userId
             claimsBuilder.claim("userId", userDetails.getUserId());
+
+            //roles
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role) // Loại bỏ tiền tố "ROLE_" nếu có
+                    .toList();
+            claimsBuilder.claim("roles", roles);
 
             // Add any extra claims
             extraClaims.forEach(claimsBuilder::claim);

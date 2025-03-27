@@ -1,5 +1,6 @@
 package com.careerconnect.controller;
 
+import com.careerconnect.atest.GoogleLoginRequest;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.request.LoginRequest;
@@ -17,15 +18,21 @@ import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.CookieUtil;
 import com.careerconnect.util.Logger;
 import com.cloudinary.Api;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,9 +42,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +56,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ApiEndpoint.PREFIX+"/auth")
+@RequestMapping(ApiEndpoint.PREFIX + "/auth")
 public class AuthController {
     private final JwtService tokenProvider;
     private final CookieUtil cookieUtil;
@@ -54,9 +65,12 @@ public class AuthController {
     private final TokenBlacklistService tokenBlacklistService;
     private final CustomUserDetailsService customUserDetailsService;
 
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestParam(value = "tk") String token, HttpServletResponse response) {
-        LoginResponse loginResponse = authService.login(loginRequest,token);
+        LoginResponse loginResponse = authService.login(loginRequest, token);
         String refreshToken = authService.generateRefreshToken(loginRequest);
 
         Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -84,19 +98,15 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(
 //            @RequestParam String refreshToken,
             @CookieValue("refreshToken") String refreshToken) {
-        String username = tokenProvider.extractUsername(refreshToken);
-        CustomUserDetails userDetails = (CustomUserDetails)customUserDetailsService.loadUserByUsername(username);
-        if (tokenProvider.isTokenValid(refreshToken, userDetails)) {
-            String newAccessToken = tokenProvider.generateAccessToken(userDetails);
-            return ResponseEntity.ok(new TokenResponse(newAccessToken));
-        } else {
-            throw new RuntimeException("Refresh token is invalid");
-        }
+        Logger.log("Refresh token: " + refreshToken);
+        String newAccessToken = tokenProvider.refreshAccessToken(refreshToken);
+        Logger.log("newAccessToken", newAccessToken);
+        return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
 
     //logout, tạm thời để require = false vì đang deploy vercel
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken",required = false) String refreshToken, HttpServletRequest req, HttpServletResponse response) {
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken", required = false) String refreshToken, HttpServletRequest req, HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
@@ -107,7 +117,26 @@ public class AuthController {
 //        tạm thời comment vì đang deploy vercel nó k cho set cookie ở bước login, còn local thì ok
 //        tokenBlacklistService.addRefreshTokenToBlacklist(refreshToken);
 
-        ApiResponse<String> apiResponse=ApiResponse.<String>builder().message("Logout successfully").build();
+        ApiResponse<String> apiResponse = ApiResponse.<String>builder().message("Logout successfully").build();
         return ResponseEntity.ok().body(apiResponse);
     }
+
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request, HttpServletResponse response) throws GeneralSecurityException, IOException {
+        // Xác minh idToken từ Google
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList(googleClientId)) // Thay bằng Client ID của bạn
+                .build();
+        GoogleIdToken idToken = verifier.verify(request.getIdToken());
+        if (idToken == null)
+            throw new GeneralSecurityException("Invalid ID token");
+        GoogleIdToken.Payload payload = idToken.getPayload();
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String pictureUrl = (String) payload.get("picture");
+
+        return ResponseEntity.ok(authService.loginGoogle(email, name, pictureUrl,response));
+    }
+
 }
