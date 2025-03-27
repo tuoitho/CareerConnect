@@ -27,6 +27,7 @@ public class AuthenticationHelper {
             if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
                 Object principal = jwtAuthenticationToken.getPrincipal();
                 if (principal instanceof Jwt jwt){
+                    Logger.log(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
                     return Long.parseLong(jwt.getClaims().get("userId").toString());
                 }
             } else

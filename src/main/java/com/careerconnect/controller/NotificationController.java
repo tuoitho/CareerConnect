@@ -6,6 +6,7 @@ import com.careerconnect.service.impl.NotificationService;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResponse;
 import com.careerconnect.dto.common.PaginatedResponse;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,7 @@ public class NotificationController {
     public ResponseEntity<ApiResponse<PaginatedResponse<NotificationResponse>>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
+        Logger.log("get notifications");
         PaginatedResponse<NotificationResponse> result = notificationService.getNotifications(page, size);
         ApiResponse<PaginatedResponse<NotificationResponse>> response = ApiResponse.<PaginatedResponse<NotificationResponse>>builder()
                 .message("Notifications retrieved successfully")

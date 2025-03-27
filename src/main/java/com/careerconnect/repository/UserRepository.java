@@ -1,5 +1,6 @@
 package com.careerconnect.repository;
 
+import com.careerconnect.entity.Candidate;
 import com.careerconnect.entity.User;
 import com.careerconnect.enums.RoleEnum;
 import org.springframework.data.domain.Page;
@@ -93,4 +94,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                         row -> ((Number) row[1]).intValue()
                 ));
     }
+
+    Optional<User> findByEmail(String email);
 }

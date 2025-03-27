@@ -43,7 +43,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList())
                 : Collections.emptyList();
-
+        Logger.log("Authorities: " + authorities);
         // Trả về JwtAuthenticationToken với principal là Jwt và authorities
         return new JwtAuthenticationToken(jwt, authorities);
     }

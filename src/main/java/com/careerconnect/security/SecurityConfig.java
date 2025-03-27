@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -43,9 +44,7 @@ import static com.careerconnect.constant.SecurityEndpoint.AUTH_WHITELIST;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-//    private final CustomAuthenticationFailureHandler failureHandler;
 
-//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 //    private final CustomUserDetailsService customUserDetailsService;
 
@@ -76,8 +75,8 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
-
-
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
     private final JwtAuthConverter jwtAuthConverter;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CustomJwtDecoder jwtDecoder) throws Exception {
@@ -100,27 +99,15 @@ public class SecurityConfig {
                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
 
                 );
+//        http.oauth2Login(oauth2 -> oauth2
+////                .defaultSuccessUrl("/login/oauth2/code/google")
+//
+//                .userInfoEndpoint(userInfo -> userInfo
+//                        .userService(customOAuth2UserService) // Custom OAuth2 user service
+//                )
+//        );
         return http.build();
     }
-
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .cors(x -> x.configurationSource(corsConfigurationSource()))
-//
-//                .exceptionHandling(exceptionHandling -> exceptionHandling
-//                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))  // Sử dụng JwtAuthenticationEntryPoint để xử lý các yêu cầu không hợp lệ
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(AUTH_WHITELIST).permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                );
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//        return http.build();
-//    }
 
 
     // can thiet neu xac thuc bang username va password
