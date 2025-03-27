@@ -148,7 +148,7 @@ public class AuthService {
 
         LoginResponse.LoggedInUser loggedInUser = LoginResponse.LoggedInUser.builder()
                 .userId(user.getUserId())
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .role(customUserDetails.getRole())
                 .build();
 
