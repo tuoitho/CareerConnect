@@ -1,11 +1,13 @@
 package com.careerconnect.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.careerconnect.entity.Company;
 import com.careerconnect.entity.Job;
 import com.careerconnect.enums.ExpEnum;
 import com.careerconnect.enums.JobTypeEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -102,4 +104,6 @@ public interface JobRepo extends JpaRepository<Job, Long> {
                         row -> ((Number) row[1]).intValue()
                 ));
     }
+
+    Page<Job> findAll(Specification<Job> spec, Pageable pageable);
 }
