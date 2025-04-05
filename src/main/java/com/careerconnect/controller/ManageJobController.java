@@ -6,6 +6,9 @@ import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,9 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ApiEndpoint.PREFIX+"/recruiter/jobs")
 @RequiredArgsConstructor
 @PreAuthorize(SecurityEndpoint.RECRUITER)
+@Tag(name = "Job Management", description = "API quản lý công việc dành cho nhà tuyển dụng")
+@SecurityRequirement(name = "bearerAuth")
 public class ManageJobController {
     private final JobService jobService;
     private final AuthenticationHelper authenticationHelper;
+    
+    @Operation(summary = "Lấy danh sách công việc", description = "API lấy danh sách các công việc mà nhà tuyển dụng đã đăng")
     @GetMapping
     public ResponseEntity<?> getJobs(@RequestParam int page, @RequestParam int size) {
         var jobs = jobService.getJobs(authenticationHelper.getUserId(),page, size);
@@ -31,6 +38,7 @@ public class ManageJobController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Xem chi tiết công việc", description = "API xem thông tin chi tiết của một công việc đã đăng theo ID")
     @GetMapping("/{jobId}")
     public ResponseEntity<?> getJobById(@PathVariable Long jobId) {
         var job = jobService.getPostedJobDetail(jobId);
@@ -41,6 +49,7 @@ public class ManageJobController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Tạo công việc mới", description = "API đăng tin tuyển dụng công việc mới")
     @PostMapping
     public ResponseEntity<?> createJob(@Valid @RequestBody CreateJobRequest job) {
         ApiResp<?> response = ApiResp.builder()
@@ -50,6 +59,7 @@ public class ManageJobController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
+    @Operation(summary = "Cập nhật công việc", description = "API cập nhật thông tin công việc đã đăng")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateJob(@PathVariable Long id, @Valid @RequestBody CreateJobRequest job) {
         ApiResp<?> response = ApiResp.builder()
@@ -59,6 +69,7 @@ public class ManageJobController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Xóa công việc", description = "API xóa công việc đã đăng")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteJob(@PathVariable Long id) {
         ApiResp<?> response = ApiResp.builder()
@@ -67,5 +78,4 @@ public class ManageJobController {
         jobService.deleteJob(authenticationHelper.getUserId(), id);
         return ResponseEntity.ok(response);
     }
-
 }

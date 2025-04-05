@@ -7,6 +7,9 @@ import com.careerconnect.entity.CoinRecharge;
 import com.careerconnect.service.impl.CoinRechargeService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +27,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/vnpay")
 @RequiredArgsConstructor
+@Tag(name = "Payment", description = "API thanh toán và nạp xu qua VNPay")
 public class VNPayApiController {
 
     private final CoinRechargeService coinRechargeService;
@@ -34,6 +38,8 @@ public class VNPayApiController {
     private String frontendUrl;
     private String paymentResultPath="/payment-result";
 
+    @Operation(summary = "Tạo giao dịch thanh toán", description = "API tạo giao dịch thanh toán để nạp xu qua VNPay")
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize(SecurityEndpoint.BOTH)
     @PostMapping("/create-payment")
     public ResponseEntity<ApiResp<Map<String, String>>> createPayment(
@@ -114,6 +120,7 @@ public class VNPayApiController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Xử lý kết quả thanh toán", description = "API callback từ VNPay để xử lý kết quả giao dịch")
     @GetMapping("/payment-return")
     public ResponseEntity<Void> paymentReturn(HttpServletRequest request) throws Exception {
         // Khởi tạo Map để lưu trữ tham số
