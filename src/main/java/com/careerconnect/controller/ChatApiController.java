@@ -1,7 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.repository.ChatMessageRepo;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.service.impl.ChatService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ public class ChatApiController {
     @GetMapping("/recruiter-contacts")
     public ResponseEntity<?> getRecruiterContacts() {
         Long userId = authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder().result(chatService.getRecruitersForCandidate(userId)).build();
+        ApiResp<?> response = ApiResp.builder().result(chatService.getRecruitersForCandidate(userId)).build();
         return ResponseEntity.ok(response);
     }
     @PreAuthorize("hasRole('RECRUITER')")
     @GetMapping("/candidate-contacts")
     public ResponseEntity<?> getUsersWithMessageHistory() {
         Long userId = authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder().result(chatService.getCandidatesForRecruiter(userId)).build();
+        ApiResp<?> response = ApiResp.builder().result(chatService.getCandidatesForRecruiter(userId)).build();
         return ResponseEntity.ok(response);
     }
 

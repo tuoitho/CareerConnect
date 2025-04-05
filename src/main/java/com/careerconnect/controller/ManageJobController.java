@@ -2,7 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.CreateJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
@@ -24,7 +24,7 @@ public class ManageJobController {
     public ResponseEntity<?> getJobs(@RequestParam int page, @RequestParam int size) {
         var jobs = jobService.getJobs(authenticationHelper.getUserId(),page, size);
 
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Jobs retrieved successfully")
                 .result(jobs)
                 .build();
@@ -34,7 +34,7 @@ public class ManageJobController {
     @GetMapping("/{jobId}")
     public ResponseEntity<?> getJobById(@PathVariable Long jobId) {
         var job = jobService.getPostedJobDetail(jobId);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Job Details retrieved successfully")
                 .result(job)
                 .build();
@@ -43,7 +43,7 @@ public class ManageJobController {
 
     @PostMapping
     public ResponseEntity<?> createJob(@Valid @RequestBody CreateJobRequest job) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Job created successfully")
                 .result(jobService.createJob(authenticationHelper.getUserId(),job))
                 .build();
@@ -52,7 +52,7 @@ public class ManageJobController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateJob(@PathVariable Long id, @Valid @RequestBody CreateJobRequest job) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Job updated successfully")
                 .result(jobService.updateJob(authenticationHelper.getUserId(), id, job))
                 .build();
@@ -61,7 +61,7 @@ public class ManageJobController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteJob(@PathVariable Long id) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Job deleted successfully")
                 .build();
         jobService.deleteJob(authenticationHelper.getUserId(), id);

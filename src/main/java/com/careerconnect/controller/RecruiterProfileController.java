@@ -2,7 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.RecruiterProfileRequest;
 import com.careerconnect.service.impl.RecruiterProfileService;
 import com.careerconnect.util.AuthenticationHelper;
@@ -23,7 +23,7 @@ public class RecruiterProfileController {
 
     @GetMapping()
     public ResponseEntity<?> getProfile() {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Company retrieved successfully")
                 .result(recruiterProfileService.getProfile(authenticationHelper.getUserId()))
                 .build();
@@ -31,7 +31,7 @@ public class RecruiterProfileController {
     }
     @PutMapping()
     public ResponseEntity<?> updateProfile(@Valid @RequestBody  RecruiterProfileRequest req) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Company updated successfully")
                 .result(recruiterProfileService.updateProfile(authenticationHelper.getUserId(), req))
                 .build();

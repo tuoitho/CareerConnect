@@ -1,7 +1,7 @@
 package com.careerconnect.controller;
 
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.CoinRechargeResponse;
 import com.careerconnect.repository.UserRepository;
@@ -65,15 +65,15 @@ public class CoinRechargeController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         PaginatedResponse<CoinRechargeResponse> historyPage = coinRechargeService.getUserRechargeHistory(userId, pageable);
 
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .result(historyPage)
                 .build();
         return ResponseEntity.ok(response);
     }
     @GetMapping("/balance")
-    public ResponseEntity<ApiResponse<Integer>> getCoinBalance() {
+    public ResponseEntity<ApiResp<Integer>> getCoinBalance() {
         Long userId = authenticationHelper.getUserId();
-        ApiResponse<Integer> response = ApiResponse.<Integer>builder()
+        ApiResp<Integer> response = ApiResp.<Integer>builder()
                 .result(coinRechargeService.getBalance(userId))
                 .message("Coin balance retrieved successfully")
                 .build();

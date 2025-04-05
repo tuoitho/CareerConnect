@@ -2,7 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.dto.response.JobResponse;
 import com.careerconnect.service.impl.SearchJobService;
@@ -33,7 +33,7 @@ public class SearchJobController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
-        ApiResponse<PaginatedResponse<JobResponse>> response = ApiResponse.<PaginatedResponse<JobResponse>>builder()
+        ApiResp<PaginatedResponse<JobResponse>> response = ApiResp.<PaginatedResponse<JobResponse>>builder()
                 .result(searchJobService.searchJobs(keyword, area, jobType, experience, category, minSalary, maxSalary, page, size))
                 .build();
         return ResponseEntity.ok(response);

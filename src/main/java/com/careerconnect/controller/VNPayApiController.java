@@ -2,14 +2,13 @@ package com.careerconnect.controller;
 
 import com.careerconnect.config.VNPayConfig;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.entity.CoinRecharge;
 import com.careerconnect.service.impl.CoinRechargeService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ public class VNPayApiController {
 
     @PreAuthorize(SecurityEndpoint.BOTH)
     @PostMapping("/create-payment")
-    public ResponseEntity<ApiResponse<Map<String, String>>> createPayment(
+    public ResponseEntity<ApiResp<Map<String, String>>> createPayment(
             @RequestParam("coinAmount") Integer coinAmount,
             HttpServletRequest request) throws Exception {
 
@@ -109,7 +108,7 @@ public class VNPayApiController {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         Map<String, String> result = new HashMap<>();
         result.put("paymentUrl", vnPayConfig.vnp_PayUrl + "?" + queryUrl);
-        ApiResponse<Map<String, String>> response = ApiResponse.<Map<String, String>>builder()
+        ApiResp<Map<String, String>> response = ApiResp.<Map<String, String>>builder()
                 .result(result)
                 .build();
         return ResponseEntity.ok(response);

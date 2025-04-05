@@ -2,15 +2,11 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
-import com.careerconnect.dto.common.PaginatedResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.response.JobDetailResponse;
-import com.careerconnect.dto.response.JobResponse;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.service.impl.SearchJobService;
 import com.careerconnect.util.AuthenticationHelper;
-import com.careerconnect.util.Logger;
-import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +24,7 @@ public class ViewJobController {
     @GetMapping("")
     public ResponseEntity<?> getCompanyJobs(@RequestParam Long companyId, @RequestParam int page, @RequestParam int size) {
         var jobs = jobService.getCompanyJobs(companyId, page, size);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Jobs retrieved successfully")
                 .result(jobs)
                 .build();
@@ -39,7 +35,7 @@ public class ViewJobController {
     public ResponseEntity<?> getDetailJobById(@PathVariable Long id) {
         Long candidateId = authenticationHelper.getUserId();
         JobDetailResponse job = jobService.getJobDetailById(candidateId,id);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Job retrieved successfully")
                 .result(job)
                 .build();
@@ -49,7 +45,7 @@ public class ViewJobController {
     @GetMapping("/search")
     public ResponseEntity<?> searchJobs(@RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
         var jobs = jobService.searchJobs(query, page, size);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Jobs retrieved successfully")
                 .result(jobs)
                 .build();
@@ -62,7 +58,7 @@ public class ViewJobController {
         Long userId = authenticationHelper.getUserId();
         Long responseData = jobService.viewApplicants(userId, jobId);
 
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .result(responseData)
                 .build();
         return ResponseEntity.ok(response);

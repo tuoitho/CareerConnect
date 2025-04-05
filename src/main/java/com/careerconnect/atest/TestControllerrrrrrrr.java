@@ -6,10 +6,12 @@ import com.careerconnect.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 public class TestControllerrrrrrrr {
     private final AuthService authService;
@@ -31,6 +33,9 @@ public class TestControllerrrrrrrr {
 
     @PostMapping("/api/tttt")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest , HttpServletResponse response) {
+
+        log.error("Login request: {}", loginRequest);
+
         LoginResponse loginResponse = authService.login(loginRequest);
 
         String refreshToken = authService.generateRefreshToken(loginRequest);

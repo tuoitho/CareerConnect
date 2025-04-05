@@ -4,7 +4,7 @@ import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.NotificationResponse;
 import com.careerconnect.service.impl.NotificationService;
 import com.careerconnect.constant.ApiEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +23,12 @@ public class NotificationController {
 
     // Lấy danh sách thông báo
     @GetMapping
-    public ResponseEntity<ApiResponse<PaginatedResponse<NotificationResponse>>> getNotifications(
+    public ResponseEntity<ApiResp<PaginatedResponse<NotificationResponse>>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
         Logger.log("get notifications");
         PaginatedResponse<NotificationResponse> result = notificationService.getNotifications(page, size);
-        ApiResponse<PaginatedResponse<NotificationResponse>> response = ApiResponse.<PaginatedResponse<NotificationResponse>>builder()
+        ApiResp<PaginatedResponse<NotificationResponse>> response = ApiResp.<PaginatedResponse<NotificationResponse>>builder()
                 .message("Notifications retrieved successfully")
                 .result(result)
                 .build();
@@ -37,9 +37,9 @@ public class NotificationController {
 
     // Đánh dấu một thông báo là đã đọc
     @PutMapping("/{notificationId}/read")
-    public ResponseEntity<ApiResponse<NotificationResponse>> markAsRead(@PathVariable Long notificationId) {
+    public ResponseEntity<ApiResp<NotificationResponse>> markAsRead(@PathVariable Long notificationId) {
         NotificationResponse result = notificationService.markAsRead(notificationId);
-        ApiResponse<NotificationResponse> response = ApiResponse.<NotificationResponse>builder()
+        ApiResp<NotificationResponse> response = ApiResp.<NotificationResponse>builder()
                 .message("Notification marked as read")
                 .result(result)
                 .build();
@@ -48,9 +48,9 @@ public class NotificationController {
 
     // Đánh dấu tất cả thông báo là đã đọc
     @PutMapping("/read-all")
-    public ResponseEntity<ApiResponse<Void>> markAllAsRead() {
+    public ResponseEntity<ApiResp<Void>> markAllAsRead() {
         notificationService.markAllAsRead();
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
+        ApiResp<Void> response = ApiResp.<Void>builder()
                 .message("All notifications marked as read")
                 .build();
         return ResponseEntity.ok(response);
@@ -58,9 +58,9 @@ public class NotificationController {
 
     // Xóa một thông báo
     @DeleteMapping("/{notificationId}")
-    public ResponseEntity<ApiResponse<Void>> deleteNotification(@PathVariable Long notificationId) {
+    public ResponseEntity<ApiResp<Void>> deleteNotification(@PathVariable Long notificationId) {
         notificationService.deleteNotification(notificationId);
-        ApiResponse<Void> response = ApiResponse.<Void>builder()
+        ApiResp<Void> response = ApiResp.<Void>builder()
                 .message("Notification deleted successfully")
                 .build();
         return ResponseEntity.ok(response);

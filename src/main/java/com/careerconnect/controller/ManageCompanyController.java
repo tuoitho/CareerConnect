@@ -2,8 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
-import com.careerconnect.dto.request.AddMemberRequest;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.RegisterCompanyRequest;
 import com.careerconnect.service.ImageService;
 import com.careerconnect.service.impl.CompanyService;
@@ -23,7 +22,7 @@ public class ManageCompanyController {
     private final ImageService imageService;
     @GetMapping("/mycompany")
     public ResponseEntity<?> getCompany() {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Company retrieved successfully")
                 .result(companyService.getCurrentCompany(authenticationHelper.getUserId()))
                 .build();
@@ -32,7 +31,7 @@ public class ManageCompanyController {
     @GetMapping("/mycompany/members")
     public ResponseEntity<?> getMembers(@RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "2") int size) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .result(companyService.getMembers(authenticationHelper.getUserId(),page,size))
                 .build();
         return ResponseEntity.ok(response);
@@ -40,7 +39,7 @@ public class ManageCompanyController {
     @DeleteMapping("/mycompany/members/{id}")
     public ResponseEntity<?> getMembers(@PathVariable long id) {
         companyService.removeMember(authenticationHelper.getUserId(),id);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Member removed successfully")
                 .build();
         return ResponseEntity.ok(response);
@@ -48,7 +47,7 @@ public class ManageCompanyController {
     @GetMapping("/{id}")
     @PreAuthorize(SecurityEndpoint.BOTH)
     public ResponseEntity<?> getCompanyById(@PathVariable Long id) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Company retrieved successfully")
                 .result(companyService.getCompanyById(id))
                 .build();
@@ -63,7 +62,7 @@ public class ManageCompanyController {
 ////            // Lưu file vào thư mục hoặc xử lý tùy ý
 ////            logoUrl = imageService.uploadCloudinary(logoFile);
 ////        }
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Company registered successfully")
                 .result(companyService.registerCompany(authenticationHelper.getUserId(), registerCompanyRequest))
                 .build();
@@ -72,7 +71,7 @@ public class ManageCompanyController {
 
     @PutMapping("/mycompany")
     public ResponseEntity<?> updateCompany(@ModelAttribute RegisterCompanyRequest registerCompanyRequest) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Company updated successfully")
                 .result(companyService.updateCompany(authenticationHelper.getUserId(), registerCompanyRequest))
                 .build();

@@ -4,7 +4,7 @@ package com.careerconnect.controller;
 import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.SavedJobResponseDTO;
 import com.careerconnect.service.impl.SavedJobService;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class SavedJobController {
     ) {
         Long candidateId = authenticationHelper.getUserId();
         SavedJobResponseDTO response = savedJobService.saveJob(candidateId, jobId);
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+        ApiResp<?> apiResponse = ApiResp.builder()
             .message("Job saved successfully")
             .result(response)
             .build();
@@ -39,7 +39,7 @@ public class SavedJobController {
     ) {
         Long candidateId = authenticationHelper.getUserId();
         List<SavedJobResponseDTO> savedJobs = savedJobService.getSavedJobs(candidateId);
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+        ApiResp<?> apiResponse = ApiResp.builder()
             .result(savedJobs)
             .build();
         return ResponseEntity.ok(apiResponse);
@@ -51,7 +51,7 @@ public class SavedJobController {
     ) {
         Long candidateId = authenticationHelper.getUserId();
         savedJobService.unsaveJob(candidateId, jobId);
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+        ApiResp<?> apiResponse = ApiResp.builder()
             .message("Job unsaved successfully")
             .build();
         return ResponseEntity.ok(apiResponse);

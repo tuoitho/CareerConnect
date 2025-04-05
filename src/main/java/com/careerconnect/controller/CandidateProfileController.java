@@ -3,7 +3,7 @@ package com.careerconnect.controller;
 import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.SimpleCandidateResponse;
 import com.careerconnect.constant.ApiEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.CandidateProfileRequest;
 import com.careerconnect.dto.response.CandidateDetailResponse;
 import com.careerconnect.dto.response.CandidateProfileResponse;
@@ -29,9 +29,9 @@ public class CandidateProfileController {
 
     @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<CandidateProfileResponse>> getProfile() {
+    public ResponseEntity<ApiResp<CandidateProfileResponse>> getProfile() {
         Long candidateId = authenticationHelper.getUserId();
-        ApiResponse<CandidateProfileResponse> response = ApiResponse.<CandidateProfileResponse>builder()
+        ApiResp<CandidateProfileResponse> response = ApiResp.<CandidateProfileResponse>builder()
                 .message("Profile retrieved successfully")
                 .result(candidateService.getProfile(candidateId))
                 .build();
@@ -47,7 +47,7 @@ public class CandidateProfileController {
         Logger.log("Profile: " + profile);
         CandidateProfileRequest profileRequest = objectMapper.readValue(profile, CandidateProfileRequest.class);
 
-        ApiResponse<CandidateProfileResponse> response = ApiResponse.<CandidateProfileResponse>builder()
+        ApiResp<CandidateProfileResponse> response = ApiResp.<CandidateProfileResponse>builder()
                 .message("Profile updated successfully")
                 .result(candidateService.updateProfile(candidateId, profileRequest, avatar))
                 .build();
@@ -59,7 +59,7 @@ public class CandidateProfileController {
     @GetMapping("/cv")
     public ResponseEntity<?> getCVs() {
         Long candidateId = authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("CVs retrieved successfully")
                 .result(candidateService.getCVs(candidateId))
                 .build();
@@ -70,7 +70,7 @@ public class CandidateProfileController {
     public ResponseEntity<?> uploadCV(@RequestPart String cvName,
                                       @RequestParam("file") MultipartFile file) {
         Long candidateId = authenticationHelper.getUserId();
-        ApiResponse<CandidateProfileResponse.CVResponse> response = ApiResponse.<CandidateProfileResponse.CVResponse>builder()
+        ApiResp<CandidateProfileResponse.CVResponse> response = ApiResp.<CandidateProfileResponse.CVResponse>builder()
                 .message("CV uploaded successfully")
                 .result(candidateService.uploadCV(candidateId, cvName, file))
                 .build();
@@ -81,7 +81,7 @@ public class CandidateProfileController {
     @DeleteMapping("/cv/{cvId}")
     public ResponseEntity<?> deleteCV(@PathVariable Long cvId) {
         Long candidateId = authenticationHelper.getUserId();
-        ApiResponse<CandidateProfileResponse.CVResponse> response = ApiResponse.<CandidateProfileResponse.CVResponse>builder()
+        ApiResp<CandidateProfileResponse.CVResponse> response = ApiResp.<CandidateProfileResponse.CVResponse>builder()
                 .message("CV deleted successfully")
                 .result(candidateService.deleteCV(candidateId, cvId))
                 .build();
@@ -93,7 +93,7 @@ public class CandidateProfileController {
     public ResponseEntity<?> getCandidateDetail(@PathVariable Long candidateId) {
         CandidateDetailResponse response = candidateService.getCandidateDetail(candidateId);
 
-        ApiResponse<CandidateDetailResponse> apiResponse = ApiResponse.<CandidateDetailResponse>builder()
+        ApiResp<CandidateDetailResponse> apiResponse = ApiResp.<CandidateDetailResponse>builder()
                 .result(response)
                 .build();
 
@@ -103,7 +103,7 @@ public class CandidateProfileController {
     @GetMapping("/chat/{candidateId}")
     public ResponseEntity<?> getCandidateForChat(@PathVariable Long candidateId) {
         SimpleCandidateResponse response = candidateService.getCandidateForChat(candidateId);
-        ApiResponse<SimpleCandidateResponse> apiResponse = ApiResponse.<SimpleCandidateResponse>builder()
+        ApiResp<SimpleCandidateResponse> apiResponse = ApiResp.<SimpleCandidateResponse>builder()
                 .result(response)
                 .build();
 

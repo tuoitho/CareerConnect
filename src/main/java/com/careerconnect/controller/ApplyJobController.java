@@ -2,7 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.ApplyJobRequest;
 import com.careerconnect.service.impl.JobService;
 import com.careerconnect.util.AuthenticationHelper;
@@ -27,7 +27,7 @@ public class ApplyJobController {
         // Logic xử lý apply job
         Long candidateId = authenticationHelper.getUserId();
         jobService.applyJob(candidateId, request);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Applied successfully")
                 .build();
         return ResponseEntity.ok(response);
@@ -41,7 +41,7 @@ public class ApplyJobController {
 
         // Logic lấy danh sách job đã apply
         Long candidateId = authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Get applied jobs successfully")
                 .result(jobService.getAppliedJobs(candidateId,page, size))
                 .build();

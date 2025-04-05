@@ -3,7 +3,7 @@ package com.careerconnect.controller;
 import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.service.impl.JobAlertSubscriptionService;
 import com.careerconnect.constant.ApiEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.JobAlertSubscriptionRequest;
 import com.careerconnect.util.AuthenticationHelper;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ public class JobAlertSubscriptionController {
     public ResponseEntity<?> subscribe(@Valid @RequestBody JobAlertSubscriptionRequest request) {
         Long candidateId = authenticationHelper.getUserId();
         jobAlertSubscriptionService.subscribe(candidateId, request);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Subscribed to job alerts successfully")
                 .build();
         return ResponseEntity.ok(response);
@@ -34,7 +34,7 @@ public class JobAlertSubscriptionController {
     public ResponseEntity<?> unsubscribe(@PathVariable Long subscriptionId) {
         Long candidateId = authenticationHelper.getUserId();
         jobAlertSubscriptionService.unsubscribe(candidateId, subscriptionId);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Unsubscribed from job alerts successfully")
                 .build();
         return ResponseEntity.ok(response);
@@ -43,7 +43,7 @@ public class JobAlertSubscriptionController {
     @GetMapping
     public ResponseEntity<?> getJobAlertSubscriptions() {
         Long candidateId = authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .result(jobAlertSubscriptionService.getJobAlertSubscriptions(candidateId))
                 .build();
         return ResponseEntity.ok(response);

@@ -4,7 +4,7 @@ import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.dto.response.ApplicationDetailResponse;
 import com.careerconnect.service.impl.ApplicationService;
 import com.careerconnect.constant.ApiEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class ApplicationController {
         Long recruiterId = authenticationHelper.getUserId();
         ApplicationDetailResponse response = applicationService.getApplicationDetail(recruiterId, applicationId);
 
-        ApiResponse<ApplicationDetailResponse> apiResponse = ApiResponse.<ApplicationDetailResponse>builder()
+        ApiResp<ApplicationDetailResponse> apiResponse = ApiResp.<ApplicationDetailResponse>builder()
                 .message("Application details retrieved successfully")
                 .result(response)
                 .build();
