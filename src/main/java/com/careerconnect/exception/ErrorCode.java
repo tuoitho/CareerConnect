@@ -30,6 +30,8 @@ public enum ErrorCode {
 
 
     INSUFFICIENT_BALANCE( 85252, "Insufficient balance", HttpStatus.BAD_REQUEST),
+    
+    AI_RESPONSE_ERROR(90001, "Error processing AI response", HttpStatus.INTERNAL_SERVER_ERROR),
 
 
 
