@@ -12,12 +12,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 
 @RestController
@@ -30,6 +32,7 @@ public class ChatbotController {
     private final ChatbotService chatbotService;
     private final AuthenticationHelper authenticationHelper;
 
+    @Operation(summary = "Send message to chatbot", description = "Sends a message to the AI chatbot and receives a response")
     @PreAuthorize(SecurityEndpoint.CANDIDATE)
     @PostMapping("/message")
     public ResponseEntity<?> sendMessage(@Valid @RequestBody ChatbotMessageRequest request) {
@@ -37,8 +40,15 @@ public class ChatbotController {
         ChatbotMessageResponse response = chatbotService.processMessage(userId, request.getMessage());
         
         return ResponseEntity.ok(ApiResp.builder()
-                .message("Chatbot response")
                 .result(response)
                 .build());
     }
+    
+//    @Operation(summary = "Stream message from chatbot", description = "Sends a message to the AI chatbot and streams the response in real-time")
+//    @PreAuthorize(SecurityEndpoint.CANDIDATE)
+//    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public Flux<String> streamResponse(@Valid @RequestBody ChatbotMessageRequest request) {
+//        Long userId = authenticationHelper.getUserId();
+//        return chatbotService.streamResponse(userId, request.getMessage());
+//    }
 }

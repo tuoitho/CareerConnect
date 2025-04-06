@@ -123,7 +123,7 @@ public class AuthService {
         body.put("response", token);
 
         return webClient.post()
-                .uri("/turnstile/v0/siteverify")
+                .uri("https://challenges.cloudflare.com/turnstile/v0/siteverify")
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(Map.class)

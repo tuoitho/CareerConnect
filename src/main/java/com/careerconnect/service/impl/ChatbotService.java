@@ -24,6 +24,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +41,7 @@ public class ChatbotService {
     private final CandidateRepo candidateRepo;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final WebClient webClient;
 
     @Value("${ai.groq.api-key:}")
     private String groqApiKey;
@@ -79,14 +82,14 @@ public class ChatbotService {
         if (isJobRequest) {
             // Extract requirements from the message using AI
             List<String> requirements = extractRequirementsWithAI(message);
-            
+
             // Get job recommendations based on requirements
             List<JobRecommendationResponse> recommendations = findMatchingJobs(requirements, candidate);
-            
+
             if (!recommendations.isEmpty()) {
                 // Generate response context with AI
                 String aiResponse = generateAIResponse(message, true, requirements);
-                
+
                 return ChatbotMessageResponse.builder()
                         .content(aiResponse)
                         .hasRecommendations(true)
@@ -94,7 +97,7 @@ public class ChatbotService {
                         .build();
             } else {
                 String aiResponse = generateAIResponse(message, false, requirements);
-                
+
                 return ChatbotMessageResponse.builder()
                         .content(aiResponse)
                         .hasRecommendations(false)
@@ -103,7 +106,7 @@ public class ChatbotService {
         } else {
             // For general questions, just use AI to generate a response
             String aiResponse = generateAIResponse(message, false, null);
-            
+
             return ChatbotMessageResponse.builder()
                     .content(aiResponse)
                     .hasRecommendations(false)
@@ -342,32 +345,48 @@ public class ChatbotService {
      * Checks if a message is requesting job recommendations
      */
     private boolean isJobRecommendationRequest(String message) {
-        String lowerMessage = message.toLowerCase();
-        
-        // Check for direct requests for job recommendations
-        if (lowerMessage.contains("tìm việc") || 
-            lowerMessage.contains("việc làm") || 
-            lowerMessage.contains("công việc") ||
-            lowerMessage.contains("tuyển dụng") ||
-            lowerMessage.contains("gợi ý") ||
-            lowerMessage.contains("đề xuất")) {
-            return true;
-        }
-        
-        // Check for common job titles and skills
-        String[] jobKeywords = {
-            "java", "python", "javascript", "react", "angular", "vue", "node", "php", 
-            "developer", "programmer", "engineer", "manager", "designer", "data", "ai", 
-            "machine learning", "full stack", "backend", "frontend", "devops", "qa", "tester", 
-            "product", "project", "ui", "ux", "mobile", "web", "cloud", "security", "network"
-        };
-        
-        for (String keyword : jobKeywords) {
-            if (lowerMessage.contains(keyword.toLowerCase())) {
-                return true;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + groqApiKey);
+
+        String systemPrompt = "Bạn là một trợ lý AI phân tích yêu cầu của người dùng. " +
+                "Nhiệm vụ của bạn là xác định xem người dùng có đang tìm kiếm công việc hay không. " +
+                "Chỉ trả về 'true' nếu người dùng đang tìm kiếm việc làm hoặc đề cập đến kỹ năng/ngành nghề " +
+                "với ý định tìm kiếm việc làm. Ngược lại, trả về 'false'.";
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "llama-3.3-70b-versatile");
+
+        List<Map<String, String>> messages = new ArrayList<>();
+        Map<String, String> systemMessage = new HashMap<>();
+        systemMessage.put("role", "system");
+        systemMessage.put("content", systemPrompt);
+        messages.add(systemMessage);
+
+        Map<String, String> userMsg = new HashMap<>();
+        userMsg.put("role", "user");
+        userMsg.put("content", message);
+        messages.add(userMsg);
+
+        requestBody.put("messages", messages);
+        requestBody.put("temperature", 0.1);
+        requestBody.put("max_tokens", 10);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(GROQ_API_URL, request, String.class);
+            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+
+            if (jsonResponse.has("choices") && jsonResponse.get("choices").size() > 0) {
+                String result = jsonResponse.get("choices").get(0).get("message").get("content").asText().toLowerCase();
+                return result.contains("true");
             }
+        } catch (Exception e) {
+            Logger.log("Error in AI job request detection: " + e.getMessage());
+            throw new AppException(ErrorCode.AI_RESPONSE_ERROR);
         }
-        
+
         return false;
     }
     
@@ -419,40 +438,7 @@ public class ChatbotService {
         return requirements;
     }
     
-    /**
-     * Calculates a match score between a job and candidate's requirements
-     */
-    private int calculateMatchScore(Job job, List<String> requirements, Candidate candidate) {
-        int score = 50; // Base score
-        
-        // Check for matching keywords in job title and description
-        for (String requirement : requirements) {
-            if (job.getTitle().toLowerCase().contains(requirement.toLowerCase())) {
-                score += 15;
-            }
-            if (job.getDescription().toLowerCase().contains(requirement.toLowerCase())) {
-                score += 10;
-            }
-        }
-        
-        // Bonus for location match if candidate has a location preference
-//        if (candidate.getLocation() != null && !candidate.getLocation().isEmpty() &&
-//            job.getLocation().equalsIgnoreCase(candidate.getLocation())) {
-//            score += 15;
-//        }
-        
-        // Check if the job's location is in the requirements
-        for (String requirement : requirements) {
-            if (job.getLocation().toLowerCase().contains(requirement.toLowerCase())) {
-                score += 10;
-                break;
-            }
-        }
-        
-        // Clamp score between 0-100
-        return Math.min(100, Math.max(0, score));
-    }
-    
+
     /**
      * Generates a text response to a user's question
      */
@@ -491,5 +477,123 @@ public class ChatbotService {
         
         // Default response for other questions
         return "Xin chào! Tôi là trợ lý AI của CareerConnect. Tôi có thể giúp bạn tìm việc làm phù hợp, cung cấp lời khuyên về sự nghiệp, và trả lời các câu hỏi về quá trình ứng tuyển. Bạn có thể hỏi tôi về 'tìm việc làm', 'chuẩn bị CV', 'kỹ năng phỏng vấn', hoặc nói về kỹ năng của bạn để nhận đề xuất công việc phù hợp.";
+    }
+
+    public Flux<String> streamResponse(Long userId, String message) {
+        Logger.log("Streaming response for user " + userId + ": " + message);
+        
+        // Get candidate info
+        Candidate candidate = candidateRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(Candidate.class, userId));
+        
+        if (!groqEnabled || groqApiKey == null || groqApiKey.isEmpty()) {
+            // If AI is not configured, return a non-streamed response
+            Logger.log("not ai enabled");
+            String response = generateAnswer(message);
+            return Flux.just(response);
+        }
+        
+        // First, determine if this is a job query
+        boolean isJobRequest = isJobRecommendationRequest(message);
+        List<String> requirements = new ArrayList<>();
+        
+        if (isJobRequest) {
+            // For job requests, extract requirements first to create better prompts
+            try {
+                requirements = extractRequirementsWithAI(message);
+            } catch (Exception e) {
+                requirements = extractJobRequirements(message);
+            }
+        }
+        
+        // Create the request for streaming
+        return streamAIResponse(message, isJobRequest, requirements, candidate);
+    }
+    
+
+    private Flux<String> streamAIResponse(String userMessage, boolean isJobRequest, List<String> requirements,Candidate candidate ) {
+        Logger.log("dang stream");
+        String systemPrompt = "Bạn là trợ lý AI của CareerConnect, một nền tảng tìm kiếm việc làm. " +
+                "Hãy trả lời ngắn gọn, hữu ích và chuyên nghiệp bằng tiếng Việt. " +
+                "Không được đưa ra thông tin sai lệch. Nếu bạn không biết câu trả lời, hãy nói rằng bạn không có thông tin.";
+        
+        if (isJobRequest && !requirements.isEmpty()) {
+            systemPrompt += " Người dùng đang tìm kiếm việc làm với các yêu cầu: " + String.join(", ", requirements) + 
+                    ". Sau khi trả lời, hãy cho họ biết rằng bạn đang tìm kiếm các công việc phù hợp và sẽ hiển thị chúng sau khi trò chuyện.";
+        }
+        
+        // Build the request body
+        Map<String, Object> requestBody = buildStreamRequestBody(systemPrompt, userMessage);
+        
+        // Use WebClient to call Groq API with streaming enabled
+        return webClient.post()
+                .uri(GROQ_API_URL)
+                .header("Authorization", "Bearer " + groqApiKey)
+                .header("Content-Type", "application/json")
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .doOnNext(chunk -> Logger.log("Raw chunk: " + chunk)) // Log raw data
+                .flatMap(this::processStreamChunk);
+    }
+    
+    /**
+     * Build the request body for streaming API call
+     */
+    private Map<String, Object> buildStreamRequestBody(String systemPrompt, String userMessage) {
+        List<Map<String, String>> messages = new ArrayList<>();
+        
+        // Add system message
+        Map<String, String> systemMessage = new HashMap<>();
+        systemMessage.put("role", "system");
+        systemMessage.put("content", systemPrompt);
+        messages.add(systemMessage);
+        
+        // Add user message
+        Map<String, String> userMsg = new HashMap<>();
+        userMsg.put("role", "user");
+        userMsg.put("content", userMessage);
+        messages.add(userMsg);
+        
+        // Build the complete request
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "llama-3.3-70b-specdec");
+        requestBody.put("messages", messages);
+        requestBody.put("temperature", 0.5);
+        requestBody.put("max_tokens", 500);
+        requestBody.put("stream", true);  // Enable streaming
+        
+        return requestBody;
+    }
+    
+    /**
+     * Process each chunk from the streaming response
+     */
+    private Flux<String> processStreamChunk(String chunk) {
+        try {
+            // Skip the [DONE] chunk
+            if (chunk.trim().equals("[DONE]")) {
+                return Flux.empty(); // No content to emit, just complete the stream
+            }
+
+            // Parse the chunk as JSON
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(chunk);
+
+            // Get the first choice’s delta object
+            JsonNode deltaNode = jsonNode.path("choices").path(0).path("delta");
+
+            // Check if there’s content in the delta
+            if (deltaNode.has("content")) {
+                String content = deltaNode.get("content").asText();
+                return Flux.just(content);
+            }
+
+            // If no content (e.g., finish_reason chunk), return empty
+            return Flux.empty();
+        } catch (Exception e) {
+            Logger.log("Error processing chunk: " + chunk + ", error: " + e.getMessage());
+            return Flux.error(new RuntimeException("Failed to process stream chunk", e));
+        }
     }
 }
