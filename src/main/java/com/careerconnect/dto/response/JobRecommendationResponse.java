@@ -16,4 +16,5 @@ public class JobRecommendationResponse {
     private String location;
     private int minSalary;
     private int maxSalary;
+    private int matchScore;
 }
