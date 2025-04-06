@@ -1,12 +1,10 @@
 package com.careerconnect.security;
 
-import com.careerconnect.dto.common.ApiResponse;
-import com.careerconnect.util.Logger;
+import com.careerconnect.dto.common.ApiResp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+        ApiResp<?> apiResponse = ApiResp.builder()
                 .message("Unauthorized: " + authException.getMessage())
                 .build();
         response.setContentType("application/json");

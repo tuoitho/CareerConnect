@@ -2,7 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.AddMemberRequest;
 import com.careerconnect.service.ImageService;
 import com.careerconnect.service.impl.CompanyService;
@@ -25,7 +25,7 @@ public class InvitationController {
     @GetMapping
     public ResponseEntity<?> getInvitations(@RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "2") int size) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Lấy thông tin thành công")
                 .result(companyService.getInvitations(authenticationHelper.getUserId(),page,size))
                 .build();
@@ -35,7 +35,7 @@ public class InvitationController {
     @PostMapping("/invite")
     public ResponseEntity<?> inviteMember(@Valid @RequestBody AddMemberRequest addMemberRequest) {
         companyService.addMember(authenticationHelper.getUserId(),addMemberRequest);
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Mời thành viên thành công")
                 .build();
         return ResponseEntity.ok(response);
@@ -44,7 +44,7 @@ public class InvitationController {
     @PostMapping("/join")
     public ResponseEntity<?> joinCompany(@RequestParam String token) {
         Long userId = authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Tham gia công ty thành công")
                 .result(companyService.accept(userId,token))
                 .build();
@@ -53,7 +53,7 @@ public class InvitationController {
 
     @GetMapping("/{token}")
     public ResponseEntity<?> getInvitationByToken(@PathVariable String token) {
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .message("Lấy thông tin thành công")
                 .result(companyService.getInvitation(token))
                 .build();

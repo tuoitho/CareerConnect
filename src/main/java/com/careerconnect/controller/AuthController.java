@@ -2,55 +2,35 @@ package com.careerconnect.controller;
 
 import com.careerconnect.atest.GoogleLoginRequest;
 import com.careerconnect.constant.ApiEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.LoginRequest;
 import com.careerconnect.dto.request.RegisterRequest;
 import com.careerconnect.dto.response.LoginResponse;
 import com.careerconnect.dto.response.TokenResponse;
-import com.careerconnect.entity.User;
-import com.careerconnect.security.CustomUserDetails;
 import com.careerconnect.security.CustomUserDetailsService;
 import com.careerconnect.security.JwtService;
 import com.careerconnect.security.TokenBlacklistService;
 import com.careerconnect.service.AuthService;
 import com.careerconnect.service.impl.UserService;
-import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.CookieUtil;
 import com.careerconnect.util.Logger;
-import com.cloudinary.Api;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 // Tạo controller để xử lý authentication
 @Slf4j
@@ -88,7 +68,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         userService.registerUser(registerRequest);
-        var response = ApiResponse.builder()
+        var response = ApiResp.builder()
                 .message("User registered successfully")
                 .build();
         return ResponseEntity.ok(response);
@@ -117,7 +97,7 @@ public class AuthController {
 //        tạm thời comment vì đang deploy vercel nó k cho set cookie ở bước login, còn local thì ok
 //        tokenBlacklistService.addRefreshTokenToBlacklist(refreshToken);
 
-        ApiResponse<String> apiResponse = ApiResponse.<String>builder().message("Logout successfully").build();
+        ApiResp<String> apiResponse = ApiResp.<String>builder().message("Logout successfully").build();
         return ResponseEntity.ok().body(apiResponse);
     }
 

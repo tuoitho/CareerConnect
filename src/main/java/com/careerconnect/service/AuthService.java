@@ -123,7 +123,7 @@ public class AuthService {
         body.put("response", token);
 
         return webClient.post()
-                .uri("/turnstile/v0/siteverify")
+                .uri("https://challenges.cloudflare.com/turnstile/v0/siteverify")
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(Map.class)
@@ -148,7 +148,7 @@ public class AuthService {
 
         LoginResponse.LoggedInUser loggedInUser = LoginResponse.LoggedInUser.builder()
                 .userId(user.getUserId())
-                .username(user.getUsername())
+                .username(user.getEmail())
                 .role(customUserDetails.getRole())
                 .build();
 

@@ -3,7 +3,7 @@ package com.careerconnect.controller;
 import com.careerconnect.constant.SecurityEndpoint;
 import com.careerconnect.service.impl.ChatMessageService;
 import com.careerconnect.constant.ApiEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class ChatMessageController {
     @GetMapping("/history")
     public ResponseEntity<?> getMessages(@RequestParam Long userId2, Principal principal) {
         Long myId=authenticationHelper.getUserId();
-        ApiResponse<?> response = ApiResponse.builder().result(chatMessageService.getMessages(myId, userId2)).build();
+        ApiResp<?> response = ApiResp.builder().result(chatMessageService.getMessages(myId, userId2)).build();
         return ResponseEntity.ok(response);
     }
 }

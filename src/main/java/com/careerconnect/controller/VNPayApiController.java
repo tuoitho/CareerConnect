@@ -2,14 +2,16 @@ package com.careerconnect.controller;
 
 import com.careerconnect.config.VNPayConfig;
 import com.careerconnect.constant.SecurityEndpoint;
-import com.careerconnect.dto.common.ApiResponse;
+import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.entity.CoinRecharge;
 import com.careerconnect.service.impl.CoinRechargeService;
 import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/vnpay")
 @RequiredArgsConstructor
+@Tag(name = "Payment", description = "API thanh toán và nạp xu qua VNPay")
 public class VNPayApiController {
 
     private final CoinRechargeService coinRechargeService;
@@ -35,9 +38,11 @@ public class VNPayApiController {
     private String frontendUrl;
     private String paymentResultPath="/payment-result";
 
+    @Operation(summary = "Tạo giao dịch thanh toán", description = "API tạo giao dịch thanh toán để nạp xu qua VNPay")
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize(SecurityEndpoint.BOTH)
     @PostMapping("/create-payment")
-    public ResponseEntity<ApiResponse<Map<String, String>>> createPayment(
+    public ResponseEntity<ApiResp<Map<String, String>>> createPayment(
             @RequestParam("coinAmount") Integer coinAmount,
             HttpServletRequest request) throws Exception {
 
@@ -109,12 +114,13 @@ public class VNPayApiController {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         Map<String, String> result = new HashMap<>();
         result.put("paymentUrl", vnPayConfig.vnp_PayUrl + "?" + queryUrl);
-        ApiResponse<Map<String, String>> response = ApiResponse.<Map<String, String>>builder()
+        ApiResp<Map<String, String>> response = ApiResp.<Map<String, String>>builder()
                 .result(result)
                 .build();
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Xử lý kết quả thanh toán", description = "API callback từ VNPay để xử lý kết quả giao dịch")
     @GetMapping("/payment-return")
     public ResponseEntity<Void> paymentReturn(HttpServletRequest request) throws Exception {
         // Khởi tạo Map để lưu trữ tham số
