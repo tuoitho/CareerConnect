@@ -1,8 +1,10 @@
-package com.careerconnect.cv;
+package com.careerconnect.service;
 
-import com.careerconnect.dto.cv.UserCVRequestDTO;
-import com.careerconnect.dto.cv.UserCVResponseDTO;
-import com.careerconnect.dto.cv.UserCVMapper;
+import com.careerconnect.repository.UserCVRepository;
+import com.careerconnect.dto.request.UserCVRequestDTO;
+import com.careerconnect.dto.response.UserCVResponseDTO;
+import com.careerconnect.mapper.UserCVMapper;
+import com.careerconnect.entity.UserCV;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

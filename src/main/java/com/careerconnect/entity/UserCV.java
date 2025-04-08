@@ -1,4 +1,4 @@
-package com.careerconnect.cv;
+package com.careerconnect.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

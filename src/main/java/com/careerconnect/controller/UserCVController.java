@@ -1,15 +1,14 @@
-package com.careerconnect.cv;
+package com.careerconnect.controller;
 
 import com.careerconnect.dto.common.ApiResp;
-import com.careerconnect.dto.cv.UserCVRequestDTO;
-import com.careerconnect.dto.cv.UserCVResponseDTO;
+import com.careerconnect.dto.request.UserCVRequestDTO;
+import com.careerconnect.dto.response.UserCVResponseDTO;
+import com.careerconnect.service.UserCVService;
 import com.careerconnect.util.AuthenticationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/cvs")
