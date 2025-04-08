@@ -48,9 +48,25 @@ public class AuthController {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
+//    @PostMapping("/login")
+//    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestParam(value = "tk") String token, HttpServletResponse response) {
+//        LoginResponse loginResponse = authService.login(loginRequest, token);
+//        String refreshToken = authService.generateRefreshToken(loginRequest);
+//
+//        Cookie cookie = new Cookie("refreshToken", refreshToken);
+//        cookie.setPath("/");
+//        cookie.setMaxAge(365 * 24 * 60 * 60);
+//        cookie.setHttpOnly(true); // Prevent client-side JavaScript from accessing the cookie
+//        cookie.setSecure(true); // Set to true if using HTTPS
+//        cookie.setAttribute("SameSite", "None"); // Allow the cookie to be sent with same-site requests
+//        response.addCookie(cookie);
+//
+//        return ResponseEntity.ok().body(loginResponse);
+//
+//    }
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestParam(value = "tk") String token, HttpServletResponse response) {
-        LoginResponse loginResponse = authService.login(loginRequest, token);
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,HttpServletResponse response) {
+        LoginResponse loginResponse = authService.login(loginRequest);
         String refreshToken = authService.generateRefreshToken(loginRequest);
 
         Cookie cookie = new Cookie("refreshToken", refreshToken);
