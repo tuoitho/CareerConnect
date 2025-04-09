@@ -16,6 +16,7 @@ public class SecurityEndpoint {
             "/api/auth/google",
             "/api/refresh/**",
             "/ws-chat/**",
+            "/ws-interview/**",
             "/api/test2",
             "/api/vnpay/payment-return",
             "/api/company/jobs/search",

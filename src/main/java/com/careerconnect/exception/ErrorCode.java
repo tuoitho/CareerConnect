@@ -34,7 +34,7 @@ public enum ErrorCode {
     AI_RESPONSE_ERROR(90001, "Error processing AI response", HttpStatus.INTERNAL_SERVER_ERROR),
 
 
-
+    INVALID_REQUEST( 10001, "Invalid request", HttpStatus.BAD_REQUEST),
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
