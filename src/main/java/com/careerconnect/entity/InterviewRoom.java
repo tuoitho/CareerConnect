@@ -1,5 +1,6 @@
-package com.careerconnect.model.interview;
+package com.careerconnect.entity;
 
+import com.careerconnect.enums.InterviewStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

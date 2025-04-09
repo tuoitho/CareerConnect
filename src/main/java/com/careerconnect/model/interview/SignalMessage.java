@@ -1,4 +1,4 @@
-package com.CareerConnect.model.interview;
+package com.careerconnect.model.interview;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

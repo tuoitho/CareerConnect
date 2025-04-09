@@ -1,7 +1,7 @@
 package com.careerconnect.repository;
 
-import com.careerconnect.model.interview.InterviewRoom;
-import com.careerconnect.model.interview.InterviewStatus;
+import com.careerconnect.entity.InterviewRoom;
+import com.careerconnect.enums.InterviewStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

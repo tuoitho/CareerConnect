@@ -4,26 +4,23 @@ import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.InterviewRequest;
 import com.careerconnect.dto.response.InterviewResponse;
 import com.careerconnect.entity.Application;
-import com.careerconnect.entity.Candidate;
 import com.careerconnect.entity.Recruiter;
 import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.exception.ResourceNotFoundException;
-import com.careerconnect.model.interview.InterviewRoom;
-import com.careerconnect.model.interview.InterviewStatus;
+import com.careerconnect.entity.InterviewRoom;
+import com.careerconnect.enums.InterviewStatus;
 import com.careerconnect.repository.ApplicationRepo;
 import com.careerconnect.repository.CandidateRepo;
 import com.careerconnect.repository.InterviewRoomRepository;
 import com.careerconnect.repository.RecruiterRepo;
 import com.careerconnect.util.AuthenticationHelper;
-import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,6 +33,7 @@ public class InterviewService {
     private final CandidateRepo candidateRepo;
     private final RecruiterRepo recruiterRepo;
 //    private final EmailService emailService;
+    private final NotificationService notificationService;
     private final AuthenticationHelper authenticationHelper;
 
     /**
@@ -52,10 +50,10 @@ public class InterviewService {
         Recruiter recruiter = recruiterRepo.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, currentUserId));
 
-//        // Validate that the recruiter belongs to the company that posted the job
-//        if (!application.getJob().getCompany().getId().equals(recruiter.getCompany().getId())) {
-//            throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to schedule interviews for this job");
-//        }
+        // Validate that the recruiter belongs to the company that posted the job
+        if (!application.getJob().getCompany().equals(recruiter.getCompany())) {
+            throw new RuntimeException("You do not have permission to schedule an interview for this application");
+        }
 
         // Check if the scheduled time is in the future
         if (request.getScheduledTime().isBefore(LocalDateTime.now())) {
@@ -64,7 +62,6 @@ public class InterviewService {
 
         // Create the interview room
         InterviewRoom interviewRoom = InterviewRoom.builder()
-//                .id(UUID.randomUUID())
                 .applicationId(application.getApplicationId())
                 .recruiterId(recruiter.getUserId())
                 .candidateId(application.getCandidate().getUserId())
@@ -79,7 +76,11 @@ public class InterviewService {
 
         // Send email notification to candidate
 //        sendInterviewNotification(interviewRoom, true);
-
+        notificationService.createNotification(
+                interviewRoom.getCandidateId(),
+                "Interview Scheduled",
+                "You have a new interview scheduled for " + interviewRoom.getScheduledTime(),
+                "interview");
         InterviewResponse response = mapToInterviewResponse(interviewRoom);
         return ApiResp.<InterviewResponse>builder().result(response).build();
     }
@@ -95,10 +96,10 @@ public class InterviewService {
         InterviewRoom interviewRoom = interviewRoomRepository.findById(interviewId)
                 .orElseThrow(() -> new RuntimeException("Interview not found"));
 
-        // Only the recruiter who created the interview can reschedule it
-//        if (!interviewRoom.getCandidateId().equals(currentUserId)) {
-//            throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to reschedule this interview");
-//        }
+//         Only the recruiter who created the interview can reschedule it
+        if (!interviewRoom.getCandidateId().equals(currentUserId)) {
+            throw new RuntimeException("You do not have permission to reschedule this interview");
+        }
 
         // Check if the interview is already completed or cancelled
         if (interviewRoom.getStatus() == InterviewStatus.COMPLETED || 
@@ -120,6 +121,12 @@ public class InterviewService {
 
         // Send notification about rescheduling
 //        sendInterviewNotification(interviewRoom, false);
+        notificationService.createNotification(
+                interviewRoom.getCandidateId(),
+                "Interview Rescheduled",
+                "Your interview has been rescheduled to " + interviewRoom.getScheduledTime(),
+                "interview");
+
 
         InterviewResponse response = mapToInterviewResponse(interviewRoom);
         return ApiResp.<InterviewResponse> builder()
@@ -143,9 +150,9 @@ public class InterviewService {
         boolean isRecruiter = interviewRoom.getRecruiterId().equals(currentUserId);
         boolean isCandidate = interviewRoom.getCandidateId().equals(currentUserId);
 
-//        if (!isRecruiter && !isCandidate) {
-//            throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to cancel this interview");
-//        }
+        if (!isRecruiter && !isCandidate) {
+            throw new RuntimeException("You do not have permission to cancel this interview");
+        }
 
         // Check if the interview is already completed or cancelled
         if (interviewRoom.getStatus() == InterviewStatus.COMPLETED || 
@@ -162,6 +169,11 @@ public class InterviewService {
         // For simplicity, the cancelledBy is determined by who is making this request
         String cancelledBy = isRecruiter ? "recruiter" : "candidate";
 //        sendCancellationNotification(interviewRoom, cancelledBy);
+        notificationService.createNotification(
+                interviewRoom.getCandidateId(),
+                "Interview Cancelled",
+                "Your interview has been cancelled by the " + cancelledBy,
+                "interview");
 
         return ApiResp.<Void>builder().build();
     }
@@ -180,9 +192,9 @@ public class InterviewService {
         boolean isRecruiter = interviewRoom.getRecruiterId().equals(currentUserId);
         boolean isCandidate = interviewRoom.getCandidateId().equals(currentUserId);
 
-//        if (!isRecruiter && !isCandidate) {
-//            throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to view this interview");
-//        }
+        if (!isRecruiter && !isCandidate) {
+            throw new RuntimeException("You do not have permission to view this interview");
+        }
 
         InterviewResponse response = mapToInterviewResponse(interviewRoom);
         return ApiResp.<InterviewResponse>builder().result(response).build();
@@ -230,15 +242,15 @@ public class InterviewService {
             Recruiter recruiter = recruiterRepo.findById(currentUserId)
                     .orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, currentUserId));
             
-//            if (!application.getJob().getCategory().equals(recruiter.getCompany())) {
-//                throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to view these interviews");
-//            }
+            if (!application.getJob().getCompany().equals(recruiter.getCompany())) {
+                throw new RuntimeException("You do not have permission to view these interviews");
+            }
         } else if ("CANDIDATE".equalsIgnoreCase(userRole)) {
-//            if (!application.getCandidateId().equals(currentUserId)) {
-//                throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to view these interviews");
-//            }
+            if (!application.getCandidate().getUserId().equals(currentUserId)) {
+                throw new RuntimeException("You do not have permission to view these interviews");
+            }
         } else {
-//            throw new AppException(ErrorCode.FORBIDDEN, "Invalid user role for fetching interviews");
+            throw new RuntimeException("Invalid user role");
         }
 
         List<InterviewRoom> interviews = interviewRoomRepository.findByApplicationId(applicationId);
@@ -268,9 +280,9 @@ public class InterviewService {
         boolean isRecruiter = interviewRoom.getRecruiterId().equals(currentUserId);
         boolean isCandidate = interviewRoom.getCandidateId().equals(currentUserId);
 
-//        if (!isRecruiter && !isCandidate) {
-//            throw new AppException(ErrorCode.FORBIDDEN, "You do not have permission to update this interview");
-//        }
+        if (!isRecruiter && !isCandidate) {
+            throw new RuntimeException("You do not have permission to update this interview");
+        }
 
         // Update the status
         interviewRoom.setStatus(status);

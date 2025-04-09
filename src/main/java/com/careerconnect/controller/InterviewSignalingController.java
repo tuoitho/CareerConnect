@@ -1,19 +1,15 @@
 package com.careerconnect.controller;
 
-import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.SignalRequest;
 import com.careerconnect.dto.response.SignalResponse;
-import com.careerconnect.model.interview.InterviewRoom;
-import com.careerconnect.model.interview.InterviewStatus;
+import com.careerconnect.entity.InterviewRoom;
+import com.careerconnect.enums.InterviewStatus;
 import com.careerconnect.repository.InterviewRoomRepository;
-import com.careerconnect.util.AuthenticationHelper;
 import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -24,7 +20,6 @@ import java.util.UUID;
 public class InterviewSignalingController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final AuthenticationHelper authenticationHelper;
     private final InterviewRoomRepository interviewRoomRepository;
 
     /**
@@ -43,9 +38,9 @@ public class InterviewSignalingController {
         boolean isRecruiter = interview.getRecruiterId().equals(currentUserId);
         boolean isCandidate = interview.getCandidateId().equals(currentUserId);
         
-//        if (!isRecruiter && !isCandidate) {
-//            throw new RuntimeException("Not authorized to join this interview");
-//        }
+        if (!isRecruiter && !isCandidate) {
+            throw new RuntimeException("Not authorized to join this interview");
+        }
         
         // Determine recipient based on who sent the message
         Long recipientId = isRecruiter ? interview.getCandidateId() : interview.getRecruiterId();

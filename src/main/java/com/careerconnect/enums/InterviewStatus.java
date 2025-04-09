@@ -1,4 +1,4 @@
-package com.careerconnect.model.interview;
+package com.careerconnect.enums;
 
 public enum InterviewStatus {
     SCHEDULED,    // Phỏng vấn đã được lên lịch

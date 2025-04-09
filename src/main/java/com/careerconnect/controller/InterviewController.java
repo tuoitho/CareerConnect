@@ -3,7 +3,7 @@ package com.careerconnect.controller;
 import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.InterviewRequest;
 import com.careerconnect.dto.response.InterviewResponse;
-import com.careerconnect.model.interview.InterviewStatus;
+import com.careerconnect.enums.InterviewStatus;
 import com.careerconnect.service.impl.InterviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
