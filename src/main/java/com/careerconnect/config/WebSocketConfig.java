@@ -18,7 +18,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomUserDetailsService customUserDetailsService;
     @Override 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-chat") 
+        registry.addEndpoint("/ws-chat")
+                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("http://localhost:3000/")
+                .withSockJS();
+                
+        // Thêm endpoint cho tính năng phỏng vấn online
+        registry.addEndpoint("/ws-interview")
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("http://localhost:3000/")
                 .withSockJS();
@@ -33,5 +39,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new AuthChannelInterceptor(tokenProvider, customUserDetailsService));
+        registration.taskExecutor()
+                .corePoolSize(8) // Tăng số thread
+                .maxPoolSize(16)
+                .queueCapacity(100); // Tăng dung lượng hàng đợi
     }
 }

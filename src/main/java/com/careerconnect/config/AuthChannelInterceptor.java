@@ -29,6 +29,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+
 //        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 //        StompCommand command = accessor.getCommand();
 //
@@ -94,37 +95,45 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 //            }
 //        }
 //        return message;
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        try {
+            StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+            if (StompCommand.CONNECT.equals(accessor.getCommand())
+//            || StompCommand.SEND.equals(accessor.getCommand())
+            ) {
 
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            Logger.log("user connected with token: " + accessor.getNativeHeader("Authorization"));
-            Object raw = message.getHeaders().get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
-            String tk2 = (String) ((ArrayList) ((Map) raw).get("Authorization")).get(0);
-            try {
-                if (StringUtils.hasText(tk2) && tk2.startsWith("Bearer ")) {
-                    tk2 = tk2.substring(7);
-                    //lúc này trong security context chưa có user
-                    CustomUserDetails customUserDetails= (CustomUserDetails) customUserDetailsService.loadUserByUsername(tokenProvider.extractUsername(tk2));
-                    if (tokenProvider.isTokenValid(tk2, customUserDetails)) {
-                        String username = tokenProvider.extractUsername(tk2);
-                        Logger.log("user login", username);
-                        // Tạo Principal từ UserDetails
+                Logger.log("CONNECT received with token: " + accessor.getNativeHeader("Authorization"));
+                Object raw = message.getHeaders().get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
+                String tk2 = (String) ((ArrayList) ((Map) raw).get("Authorization")).get(0);
+                try {
+                    if (StringUtils.hasText(tk2) && tk2.startsWith("Bearer ")) {
+                        tk2 = tk2.substring(7);
+                        //lúc này trong security context chưa có user
+                        CustomUserDetails customUserDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(tokenProvider.extractUsername(tk2));
+                        if (tokenProvider.isTokenValid(tk2, customUserDetails)) {
+                            String username = tokenProvider.extractUsername(tk2);
+                            Logger.log("user login", username);
+                            // Tạo Principal từ UserDetails
 //                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 //                                userDetails, null, userDetails.getAuthorities()
 //                        );
-                        Logger.log("customUserDetails login", customUserDetails);
+                            Logger.log("customUserDetails login", customUserDetails);
 
-                        // Đặt Principal trực tiếp vào accessor
-                        accessor.setUser(() -> customUserDetails.getUserId().toString());
+                            // Đặt Principal trực tiếp vào accessor
+                            accessor.setUser(() -> customUserDetails.getUserId().toString());
+                        } else {
+                            Logger.log("Token validation failed for " + accessor.getCommand());
+                        }
                     } else {
-                        Logger.log("Token validation failed for " + accessor.getCommand());
+                        Logger.log("No valid Bearer token found for " + accessor.getCommand());
                     }
-                } else {
-                    Logger.log("No valid Bearer token found for " + accessor.getCommand());
+                } catch (Exception ex) {
+                    Logger.log("Error during WebSocket authentication for " + accessor.getCommand() + ": " + ex.getMessage());
                 }
-            } catch (Exception ex) {
-                Logger.log("Error during WebSocket authentication for " + accessor.getCommand() + ": " + ex.getMessage());
             }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+
         }
         return message;
     }

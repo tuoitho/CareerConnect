@@ -1,6 +1,7 @@
 package com.careerconnect.config;
 
 import com.careerconnect.dto.chat.UserStatusMessage;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,6 +31,7 @@ public class WebSocketEventListener {
             onlineUsers.add(userId);
             // Cập nhật trạng thái online trong DB nếu cần
 //            System.out.println("User connected: " + userId);
+            Logger.log("User connected: " + userId);
             messagingTemplate.convertAndSend("/topic/userStatus", new UserStatusMessage(userId, true));
         }
     }

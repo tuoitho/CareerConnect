@@ -16,12 +16,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationHelper {
     private final UserRepository userRepository;
     public Long getUserId() {
+        //if la websocket, authchannelInterceptor
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
