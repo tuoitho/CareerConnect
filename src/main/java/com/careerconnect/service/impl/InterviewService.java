@@ -15,11 +15,14 @@ import com.careerconnect.repository.CandidateRepo;
 import com.careerconnect.repository.InterviewRoomRepository;
 import com.careerconnect.repository.RecruiterRepo;
 import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -55,23 +58,20 @@ public class InterviewService {
             throw new RuntimeException("You do not have permission to schedule an interview for this application");
         }
 
-        // Check if the scheduled time is in the future
-        if (request.getScheduledTime().isBefore(LocalDateTime.now())) {
-            throw new AppException(ErrorCode.INVALID_REQUEST);
-        }
 
         // Create the interview room
         InterviewRoom interviewRoom = InterviewRoom.builder()
                 .applicationId(application.getApplicationId())
                 .recruiterId(recruiter.getUserId())
                 .candidateId(application.getCandidate().getUserId())
-                .scheduledTime(request.getScheduledTime())
+                .scheduledTime(LocalDateTime.now())
                 .notes(request.getMessage())
                 .status(InterviewStatus.SCHEDULED)
-                .startTime(LocalDateTime.now())
+                .startTime(request.getScheduledTime()
+                        .atZoneSameInstant(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime())
                 .roomName("Interview Room " + UUID.randomUUID())
                 .build();
-
+        Logger.log(interviewRoom);
         interviewRoomRepository.save(interviewRoom);
 
         // Send email notification to candidate
@@ -107,13 +107,10 @@ public class InterviewService {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        // Check if the new scheduled time is in the future
-        if (request.getScheduledTime().isBefore(LocalDateTime.now())) {
-            throw new AppException(ErrorCode.INVALID_REQUEST);
-        }
+
 
         // Update the interview
-        interviewRoom.setScheduledTime(request.getScheduledTime());
+        interviewRoom.setScheduledTime(request.getScheduledTime().toLocalDateTime());
         interviewRoom.setNotes(request.getMessage());
         interviewRoom.setStatus(InterviewStatus.RESCHEDULED);
 
