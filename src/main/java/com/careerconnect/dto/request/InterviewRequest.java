@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -20,7 +21,7 @@ public class InterviewRequest {
     
     @NotNull(message = "Scheduled time is required")
     @Future(message = "Scheduled time must be in the future")
-    private LocalDateTime scheduledTime;
+    private OffsetDateTime scheduledTime;
     
     private String message;
 }
