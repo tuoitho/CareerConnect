@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -62,10 +64,11 @@ public class InterviewService {
                 .applicationId(application.getApplicationId())
                 .recruiterId(recruiter.getUserId())
                 .candidateId(application.getCandidate().getUserId())
-                .scheduledTime(request.getScheduledTime().toLocalDateTime())
+                .scheduledTime(LocalDateTime.now())
                 .notes(request.getMessage())
                 .status(InterviewStatus.SCHEDULED)
-                .startTime(LocalDateTime.now())
+                .startTime(request.getScheduledTime()
+                        .atZoneSameInstant(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime())
                 .roomName("Interview Room " + UUID.randomUUID())
                 .build();
         Logger.log(interviewRoom);
