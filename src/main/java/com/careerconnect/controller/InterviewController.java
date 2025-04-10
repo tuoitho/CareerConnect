@@ -2,6 +2,7 @@ package com.careerconnect.controller;
 
 import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.InterviewRequest;
+import com.careerconnect.dto.request.RescheduleRequest;
 import com.careerconnect.dto.response.InterviewResponse;
 import com.careerconnect.enums.InterviewStatus;
 import com.careerconnect.service.impl.InterviewService;
@@ -35,7 +36,7 @@ public class InterviewController {
     @PostMapping("/{interviewId}/reschedule")
     public ResponseEntity<ApiResp<InterviewResponse>> rescheduleInterview(
             @PathVariable UUID interviewId,
-            @Valid @RequestBody InterviewRequest request) {
+            @Valid @RequestBody RescheduleRequest request) {
         return ResponseEntity.ok(interviewService.rescheduleInterview(interviewId, request));
     }
 

@@ -2,6 +2,7 @@ package com.careerconnect.service.impl;
 
 import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.InterviewRequest;
+import com.careerconnect.dto.request.RescheduleRequest;
 import com.careerconnect.dto.response.InterviewResponse;
 import com.careerconnect.entity.Application;
 import com.careerconnect.entity.Recruiter;
@@ -89,7 +90,7 @@ public class InterviewService {
      * Reschedule an existing interview
      */
     @Transactional
-    public ApiResp<InterviewResponse> rescheduleInterview(UUID interviewId, InterviewRequest request) {
+    public ApiResp<InterviewResponse> rescheduleInterview(UUID interviewId, RescheduleRequest request) {
         Long currentUserId = authenticationHelper.getUserId();
         
         // Find the interview
@@ -97,7 +98,7 @@ public class InterviewService {
                 .orElseThrow(() -> new RuntimeException("Interview not found"));
 
 //         Only the recruiter who created the interview can reschedule it
-        if (!interviewRoom.getCandidateId().equals(currentUserId)) {
+        if (!interviewRoom.getRecruiterId().equals(currentUserId)) {
             throw new RuntimeException("You do not have permission to reschedule this interview");
         }
 
@@ -110,10 +111,12 @@ public class InterviewService {
 
 
         // Update the interview
-        interviewRoom.setScheduledTime(request.getScheduledTime().toLocalDateTime());
+//        interviewRoom.setScheduledTime(request.getScheduledTime().toLocalDateTime());
+        interviewRoom.setStartTime(request.getScheduledTime()
+                .atZoneSameInstant(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime());
         interviewRoom.setNotes(request.getMessage());
         interviewRoom.setStatus(InterviewStatus.RESCHEDULED);
-
+        interviewRoom.setScheduledTime(LocalDateTime.now());
         interviewRoomRepository.save(interviewRoom);
 
         // Send notification about rescheduling
