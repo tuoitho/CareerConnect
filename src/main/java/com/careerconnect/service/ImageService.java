@@ -31,24 +31,7 @@ public class ImageService {
             throw new RuntimeException("Failed to upload image to Cloudinary", e);
         }
     }
-//    public String saveImage(MultipartFile imageFile) throws IOException {
-//        // Kiểm tra thư mục đã tồn tại chưa, nếu chưa thì tạo mới
-//        File directory = new File(uploadDir);
-//        if (!directory.exists()) {
-//            directory.mkdirs();
-//        }
-//
-//        // Tạo tên file duy nhất để tránh trùng lặp
-//        String fileExtension = getFileExtension(Objects.requireNonNull(imageFile.getOriginalFilename()));
-//        String uniqueFileName = UUID.randomUUID().toString() + "." + fileExtension;
-//
-//        // Lưu file vào thư mục
-//        Path path = Paths.get(uploadDir + File.separator + uniqueFileName);
-//        Files.write(path, imageFile.getBytes());
-//
-//        // Trả về đường dẫn tới file vừa lưu (có thể là URL hoặc tên file)
-//        return uniqueFileName;  // Hoặc URL, tùy vào cách bạn cấu hình truy cập ảnh
-//    }
+
 
     // Hàm lấy đuôi file (ví dụ: jpg, png, ...)
     private String getFileExtension(String filename) {

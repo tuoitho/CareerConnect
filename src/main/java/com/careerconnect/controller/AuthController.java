@@ -1,6 +1,6 @@
 package com.careerconnect.controller;
 
-import com.careerconnect.atest.GoogleLoginRequest;
+import com.careerconnect.dto.request.GoogleLoginRequest;
 import com.careerconnect.constant.ApiEndpoint;
 import com.careerconnect.dto.common.ApiResp;
 import com.careerconnect.dto.request.LoginRequest;

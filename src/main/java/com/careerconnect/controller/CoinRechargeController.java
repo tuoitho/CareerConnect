@@ -27,34 +27,6 @@ public class CoinRechargeController {
     private final AuthenticationHelper authenticationHelper;
     private final UserRepository userRepository;
 
-//    // Tạo yêu cầu nạp xu
-//    @PostMapping("/create")
-//    public ResponseEntity<?> createRecharge(
-//            @RequestParam Long userId,
-//            @RequestParam Integer coinAmount,
-//            @RequestParam Double amountPaid,
-//            @RequestParam String paymentMethod) {
-//        CoinRecharge recharge = coinRechargeService.createRecharge(userId, coinAmount, amountPaid, paymentMethod);
-//        ApiResponse<?> response = ApiResponse.builder()
-//                .message("Recharge created successfully")
-//                .result(recharge)
-//                .build();
-//        return ResponseEntity.ok(response);
-//    }
-
-    // Hoàn tất giao dịch (giả lập callback từ cổng thanh toán)
-//    @PutMapping("/complete/{rechargeId}")
-//    public ResponseEntity<CoinRecharge> completeRecharge(@PathVariable Long rechargeId) {
-//        CoinRecharge recharge = coinRechargeService.completeRecharge(rechargeId);
-//        return ResponseEntity.ok(recharge);
-//    }
-
-    // Đánh dấu giao dịch thất bại
-//    @PutMapping("/fail/{rechargeId}")
-//    public ResponseEntity<CoinRecharge> failRecharge(@PathVariable Long rechargeId) {
-//        CoinRecharge recharge = coinRechargeService.failRecharge(rechargeId);
-//        return ResponseEntity.ok(recharge);
-//    }
 
     // Get recharge history with pagination
     @GetMapping("/recharge-history")

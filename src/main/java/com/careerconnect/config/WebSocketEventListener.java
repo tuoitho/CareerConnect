@@ -20,7 +20,6 @@ public class WebSocketEventListener {
     // Lưu danh sách user online (userId)
     private final Set<Long> onlineUsers = new HashSet<>();
     private final SimpMessagingTemplate messagingTemplate; // Inject để gửi thông báo
-    //  TODO:  Thông báo thay đổi trạng thái qua WebSocket: Khi một user kết nối hoặc ngắt kết nối, gửi thông báo qua WebSocket để frontend cập nhật trạng thái thời gian thực:
 
     @EventListener
     public void handleWebSocketConnect(SessionConnectedEvent event) {

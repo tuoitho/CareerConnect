@@ -89,13 +89,7 @@ public class ChatController {
 
     @MessageMapping("/chat.typing/{recipientId}")
     public void typing(SimpMessageHeaderAccessor sha, @Payload ChatMessageDTO messageDTO) {
-//        Logger.log("Principal: " + sha.getUser().getName());
-//        Logger.log("Typing: " + messageDTO);
-//        messagingTemplate.convertAndSendToUser(
-//                messageDTO.getRecipientId().toString(),
-//                "/queue/typing",
-//                messageDTO.getSenderId()
-//        );
+
     }
     ChatMessage convertToEntity(ChatMessageDTO messageDTO) {
         ChatMessage message = new ChatMessage();

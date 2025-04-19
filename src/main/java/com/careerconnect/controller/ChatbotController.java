@@ -44,11 +44,5 @@ public class ChatbotController {
                 .build());
     }
     
-//    @Operation(summary = "Stream message from chatbot", description = "Sends a message to the AI chatbot and streams the response in real-time")
-//    @PreAuthorize(SecurityEndpoint.CANDIDATE)
-//    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public Flux<String> streamResponse(@Valid @RequestBody ChatbotMessageRequest request) {
-//        Long userId = authenticationHelper.getUserId();
-//        return chatbotService.streamResponse(userId, request.getMessage());
-//    }
+
 }

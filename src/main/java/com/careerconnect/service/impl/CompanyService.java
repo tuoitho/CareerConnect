@@ -43,10 +43,7 @@ import java.util.UUID;
 public class CompanyService {
     private final PaginationService paginationService;
     private final CompanyRepo companyRepo;
-    private final AuthenticationHelper authenticationHelper;
     private final CompanyMapper companyMapper;
-    private final RoleService roleService;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final ImageService imageService;
     private final RedisTemplate<String, String> redisTemplate;

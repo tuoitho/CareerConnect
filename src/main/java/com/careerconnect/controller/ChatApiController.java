@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ChatApiController {
 
     private final AuthenticationHelper authenticationHelper;
-    private final ChatMessageRepo chatMessageRepo;
     private final ChatService chatService;
     
     @Operation(summary = "Lấy danh sách nhà tuyển dụng đã chat", description = "API lấy danh sách nhà tuyển dụng đã nhắn tin với ứng viên hiện tại")
@@ -42,12 +41,5 @@ public class ChatApiController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Tải lên tệp tin", description = "API tải lên tệp tin để gửi trong cuộc trò chuyện")
-    @PostMapping("/upload-file")
-    public void handleFileUpload(
-        @RequestParam("file") MultipartFile file,
-        @RequestParam Long recipientId 
-    ) {
-        // Xử lý upload file và gửi notification qua WebSocket 
-    }
+
 }
