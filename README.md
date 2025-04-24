@@ -157,6 +157,4 @@ Contributions are welcome! If you'd like to contribute, please follow these gene
 
 ## License
 
-This project is currently unlicensed.
-
-*(Optional: Replace the line above with your chosen license, e.g., "This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details." and add a `LICENSE` file to your repository.)*
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
