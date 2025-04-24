@@ -137,12 +137,6 @@ Once the application is running, API documentation is available via Swagger UI a
 
 `http://localhost:8080/swagger-ui.html`
 
-## Deployment
-
-*   **Docker:** A `Dockerfile` is provided for building a container image.
-*   **Nixpacks:** A `nixpacks.toml` file is included for building with Nixpacks (often used by platforms like Railway).
-*   **Azure:** A GitHub Actions workflow (`.github/workflows/a_careerconnect.yml`) is configured for deploying the application to Azure Web Apps.
-
 ## Contributing
 
 Contributions are welcome! If you'd like to contribute, please follow these general guidelines:
