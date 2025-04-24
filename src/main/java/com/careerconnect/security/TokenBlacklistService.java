@@ -19,7 +19,8 @@ public class TokenBlacklistService {
         redisTemplate.opsForValue().set(token, "blacklisted", Duration.ofDays(30)); // Vi thoi gian song cua refresh token la 30 ngay
     }
     public void addAccessTokenToBlacklist(String token) {
-        redisTemplate.opsForValue().set(token, "blacklisted", Duration.ofMinutes(120));
+        //tạm cmt
+//        redisTemplate.opsForValue().set(token, "blacklisted", Duration.ofMinutes(120));
     }
 
     public boolean isBlacklisted(String token) {

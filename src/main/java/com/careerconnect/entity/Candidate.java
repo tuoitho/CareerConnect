@@ -15,10 +15,10 @@ import java.util.Set;
 @Getter
 @Setter
 public class Candidate extends User {
-    private String fullname;
+//    private String fullname;
     private String avatar;
     private String phone;
-    private String email;
+//    private String email;
     private String bio;
 
 

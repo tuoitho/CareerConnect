@@ -9,6 +9,7 @@ import com.careerconnect.enums.MessageStatus;
 import com.careerconnect.repository.ChatMessageRepo;
 import com.careerconnect.repository.UserRepository;
 import com.careerconnect.util.Logger;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -21,11 +22,13 @@ import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Chat WebSocket", description = "WebSocket API cho chức năng chat thời gian thực")
 public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageRepo messageRepository;
     private final UserRepository userRepository;
     private final WebSocketEventListener webSocketEventListener; // Inject để kiểm tra online
+    
     @MessageMapping("/chat.send")
     public void sendMessage(
             @Payload ChatMessageDTO messageDTO,
@@ -86,13 +89,7 @@ public class ChatController {
 
     @MessageMapping("/chat.typing/{recipientId}")
     public void typing(SimpMessageHeaderAccessor sha, @Payload ChatMessageDTO messageDTO) {
-//        Logger.log("Principal: " + sha.getUser().getName());
-//        Logger.log("Typing: " + messageDTO);
-//        messagingTemplate.convertAndSendToUser(
-//                messageDTO.getRecipientId().toString(),
-//                "/queue/typing",
-//                messageDTO.getSenderId()
-//        );
+
     }
     ChatMessage convertToEntity(ChatMessageDTO messageDTO) {
         ChatMessage message = new ChatMessage();
@@ -102,4 +99,3 @@ public class ChatController {
         return message;
     }
 }
- 

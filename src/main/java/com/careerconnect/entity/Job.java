@@ -48,4 +48,7 @@ public class Job {
 
     @OneToMany(mappedBy = "job",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Application> applications;
+
+    // add
+    private boolean approved = false;
 }

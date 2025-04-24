@@ -9,7 +9,8 @@ import com.careerconnect.enums.RoleEnum;
 import com.careerconnect.mapper.UserMapper;
 import com.careerconnect.repository.RoleRepository;
 import com.careerconnect.repository.UserRepository;
-import com.careerconnect.security.JwtTokenProvider;
+import com.careerconnect.security.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.security.core.Authentication;
@@ -19,15 +20,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final JwtTokenProvider tokenProvider;
+    private final JwtService tokenProvider;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public String generateAccessToken(Authentication authentication) {
-        return tokenProvider.generateAccessToken(authentication);
-    }
 
     public void registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {

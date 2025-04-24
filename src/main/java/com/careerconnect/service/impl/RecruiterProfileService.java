@@ -7,6 +7,7 @@ import com.careerconnect.exception.AppException;
 import com.careerconnect.exception.ErrorCode;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.RecruiterRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class RecruiterProfileService {
     private final PasswordEncoder passwordEncoder;
 
     //  Cập nhật hồ sơ của recruiter
+    @Transactional
     public RecruiterProfileResponse updateProfile(Long userId,RecruiterProfileRequest req) {
         Recruiter recruiter = recruiterRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException(Recruiter.class, userId));
         recruiter.setPassword(passwordEncoder.encode(req.getPassword()));

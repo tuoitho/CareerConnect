@@ -1,13 +1,13 @@
 package com.careerconnect.exception;
 
-import com.careerconnect.dto.common.ApiResponse;
-import com.careerconnect.util.Logger;
+import com.careerconnect.dto.common.ApiResp;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class HandleException {
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception e) {
-        ApiResponse<?> apiResponse = new ApiResponse<>();
+    ResponseEntity<ApiResp<?>> handlingRuntimeException(Exception e) {
+        ApiResp<?> apiResponse = new ApiResp<>();
         apiResponse.setMessage(e.getMessage());
         apiResponse.setCode(500);
         e.printStackTrace();
@@ -25,9 +25,9 @@ public class HandleException {
     }
 
     @ExceptionHandler(value = AppException.class)
-    ResponseEntity<ApiResponse<?>> handlingAppException(AppException exception) {
+    ResponseEntity<ApiResp<?>> handlingAppException(AppException exception) {
         ErrorCode errorCode = exception.getErrorCode();
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+        ApiResp<?> apiResponse = ApiResp.builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();
@@ -35,8 +35,8 @@ public class HandleException {
     }
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
-    ResponseEntity<ApiResponse<?>> handlingResourceNotFoundException(ResourceNotFoundException e) {
-        ApiResponse<?> apiResponse = ApiResponse.builder()
+    ResponseEntity<ApiResp<?>> handlingResourceNotFoundException(ResourceNotFoundException e) {
+        ApiResp<?> apiResponse = ApiResp.builder()
                 .code(25252)
                 .message(e.getMessage())
                 .build();
@@ -60,11 +60,22 @@ public class HandleException {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
-        ApiResponse<?> response = ApiResponse.builder()
+        ApiResp<?> response = ApiResp.builder()
                 .code(code)
                 .message(errorMessage)
                 .build();
         return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    ResponseEntity<ApiResp<?>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+//        chỉ lấy message đầu tiên
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        ApiResp<?> apiResponse = ApiResp.builder()
+                .code(25252)
+                .message(errorMessage)
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
     }
 
 }

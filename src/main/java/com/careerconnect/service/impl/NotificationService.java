@@ -5,8 +5,10 @@ import com.careerconnect.dto.common.PaginatedResponse;
 import com.careerconnect.entity.Notification;
 import com.careerconnect.exception.ResourceNotFoundException;
 import com.careerconnect.repository.NotificationRepository;
+import com.careerconnect.repository.UserRepository;
 import com.careerconnect.service.PaginationService;
 import com.careerconnect.util.AuthenticationHelper;
+import com.careerconnect.util.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,10 +27,12 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final PaginationService paginationService;
     private final AuthenticationHelper authenticationHelper;
+    private final UserRepository userRepository;
 
     // Lấy danh sách thông báo phân trang
     public PaginatedResponse<NotificationResponse> getNotifications(int page, int size) {
         Long userId = authenticationHelper.getUserId();
+        Logger.log("getNotifications userId = " + userId);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Notification> notifications = notificationRepository.findByUser_UserIdOrderByCreatedAtDesc(userId, pageable);
 
@@ -98,7 +102,7 @@ public class NotificationService {
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
                 .type(type)
-                .user(authenticationHelper.getCurrentUser()) // Lấy user từ AuthenticationHelper
+                .user(userRepository.findById(userId).orElseThrow()) // Lấy user từ AuthenticationHelper
                 .build();
         notificationRepository.save(notification);
     }

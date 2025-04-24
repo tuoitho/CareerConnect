@@ -10,15 +10,4 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoleService {
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-//    public Role mapRole(String userType) {
-//        return roleRepository.findByRoleName(userType)
-//                .orElseGet(() -> {
-//                    Role role = new Role();
-//                    role.setRoleName(userType);
-//                    return roleRepository.save(role);
-//                });
-//    }
 }

@@ -23,7 +23,8 @@ public class CandidateProfileRequest {
     
     @Email
     private String email;
-    
+
+    @NotBlank(message = "bio không được để trống")
     private String bio;
     private List<String> skills;
     
