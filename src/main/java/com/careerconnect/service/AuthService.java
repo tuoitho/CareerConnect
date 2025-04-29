@@ -76,20 +76,15 @@ public class AuthService {
                 .build();
     }
     public LoginResponse login(LoginRequest loginRequest) {
-        Authentication authentication=null;
-        try {
-            authentication = authenticationManager.authenticate(
+        Authentication authentication=authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()
                     )
             );
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        Logger.log("Authentication: " + authentication.getPrincipal());
-        Logger.log("Authentication: " + authentication.getDetails());
+
+//        Logger.log("Authentication: " + authentication.getPrincipal());
+//        Logger.log("Authentication: " + authentication.getDetails());
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         String accessToken = tokenProvider.generateAccessToken(user);
 
